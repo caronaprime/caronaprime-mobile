@@ -1,5 +1,6 @@
+import 'package:carona_prime/app/pages/login/login_page.dart';
+import 'package:carona_prime/app/widgets/logo_carona.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class WelcomePage extends StatefulWidget {
   @override
@@ -9,13 +10,46 @@ class WelcomePage extends StatefulWidget {
 class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
-    return PlatformScaffold(
-      appBar: PlatformAppBar(
-        title: Text("Welcome"),
-      ),
-      body: Column(
-        children: <Widget>[],
+    return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
+      bottomNavigationBar: BottomAppBar(
+          color: Theme.of(context).primaryColor,
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              FlatButton(
+                child: Text('Prosseguir'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                },
+              ),
+            ],
+          )),
+      body: Center(
+        child: ListView(
+          shrinkWrap: false,
+          padding: EdgeInsets.only(left: 24.0, right: 24.0),
+          children: <Widget>[
+            SizedBox(height: 60.0),
+            LogoCarona(),
+            SizedBox(height: 25.0),
+            welcomeLabel()
+          ],
+        ),
       ),
     );
+  }
+
+  Center welcomeLabel() {
+    final welcome = Center(
+      child: Container(
+        child: Text('Bem vindo ao Carona Prime'),
+      ),
+    );
+    return welcome;
   }
 }
