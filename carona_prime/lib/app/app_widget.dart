@@ -5,14 +5,16 @@ class AppWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Slidy',
+      debugShowCheckedModeBanner: false,
+      title: 'Carona Prime',
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
-        accentColor: Colors.white,
+        accentColor: Colors.white,        
         primaryColor: Color(0xFFe64a19),
         primaryColorLight: Color(0xFFff7d47),
         primaryColorDark: Color(0xFFac0800),
         backgroundColor: Color(0xFF424242),
+        bottomAppBarTheme: BottomAppBarTheme(color: Color(0xFFe64a19)),
         inputDecorationTheme: InputDecorationTheme(
           contentPadding: EdgeInsets.all(16),
           labelStyle: TextStyle(fontSize: 24),
@@ -24,10 +26,13 @@ class AppWidget extends StatelessWidget {
           shape: RoundedRectangleBorder(            
             borderRadius: BorderRadius.circular(10.0),
           ),
+          disabledColor: Colors.grey[300],          
+          splashColor: Colors.white24,
         ),
         textTheme: TextTheme(
           button: TextStyle(fontSize: 18.0),
-          body1: TextStyle(color: Colors.white, fontSize: 23.0),
+          body1: TextStyle(color: Colors.black, fontSize: 18),
+          body2: TextStyle(color: Colors.white, fontSize: 24)
         ),
       ),
       home: HomeModule(),

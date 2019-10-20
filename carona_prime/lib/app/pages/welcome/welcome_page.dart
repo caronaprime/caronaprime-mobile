@@ -13,22 +13,21 @@ class _WelcomePageState extends State<WelcomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       bottomNavigationBar: BottomAppBar(
-          color: Theme.of(context).primaryColor,
           child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              FlatButton(
-                child: Text('Prosseguir'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
-                },
-              ),
-            ],
-          )),
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          FlatButton(
+            child: Text('Prosseguir'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()),
+              );
+            },
+          ),
+        ],
+      )),
       body: Center(
         child: ListView(
           shrinkWrap: false,
@@ -45,11 +44,9 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 
   Center welcomeLabel() {
-    final welcome = Center(
-      child: Container(
-        child: Text('Bem vindo ao Carona Prime'),
-      ),
+    return Center(
+      child: Text('Bem vindo ao Carona Prime',
+          style: Theme.of(context).textTheme.body2),
     );
-    return welcome;
   }
 }
