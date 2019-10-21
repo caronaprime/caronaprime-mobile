@@ -17,12 +17,11 @@ class _HomePageState extends State<HomePage> {
     );
 
     return Scaffold(
-      appBar: new AppBar(
-        title: new Text('Carona Prime')
+      appBar: AppBar(
+        title: Text('Carona Prime')
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Color(0xFFCC4B22),
-        child: new Row(
+      bottomNavigationBar: BottomAppBar(        
+        child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[

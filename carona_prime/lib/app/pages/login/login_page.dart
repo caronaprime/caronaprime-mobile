@@ -1,7 +1,7 @@
 import 'package:carona_prime/app/app_module.dart';
+import 'package:carona_prime/app/pages/login_mode/login_mode_page.dart';
 import 'package:carona_prime/app/widgets/logo_carona.dart';
 import 'package:flutter/material.dart';
-
 import 'login_bloc.dart';
 
 class LoginPage extends StatefulWidget {
@@ -23,6 +23,8 @@ class _LoginPageState extends State<LoginPage> {
             padding: const EdgeInsets.all(32.0),
             child: LogoCarona(),
           ),
+          Expanded(flex: 2, child: SizedBox()),
+          Center(child: Text("Informe seu número de celular")),
           Expanded(flex: 2, child: SizedBox()),
           phoneTextField(),
           loginButton(),
@@ -46,7 +48,10 @@ class _LoginPageState extends State<LoginPage> {
       padding: const EdgeInsets.all(8.0),
       child: RaisedButton(
         child: Text("Entrar"),
-        onPressed: () async {},
+        onPressed: () async {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => LoginModePage()));
+        },
       ),
     );
   }

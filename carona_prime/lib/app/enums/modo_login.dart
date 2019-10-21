@@ -1,0 +1,1 @@
+enum ModoDeLogin { caroneiro, motorista }
