@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "394023457639",
+    "firebase_url": "https://carona-prime-9f9fb.firebaseio.com",
+    "project_id": "carona-prime-9f9fb",
+    "storage_bucket": "carona-prime-9f9fb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:394023457639:android:c8488981129639a605d5c2",
+        "android_client_info": {
+          "package_name": "com.example.carona_prime"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "394023457639-v5qlc860kritpv4kivlmfgi94p3fq3mb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUzIo97swbq06H-h1H-CrDAwTNfEbcH2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "394023457639-v5qlc860kritpv4kivlmfgi94p3fq3mb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

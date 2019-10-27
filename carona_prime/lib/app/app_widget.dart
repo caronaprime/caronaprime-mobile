@@ -31,8 +31,7 @@ class AppWidget extends StatelessWidget {
         ),
         textTheme: TextTheme(
           button: TextStyle(fontSize: 18.0),
-          body1: TextStyle(color: Colors.black, fontSize: 18),
-          body2: TextStyle(color: Colors.white, fontSize: 24)
+          body1: TextStyle(color: Colors.black, fontSize: 18)          
         ),
       ),
       home: HomeModule(),

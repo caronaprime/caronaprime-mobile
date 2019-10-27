@@ -25,7 +25,6 @@ class _HomePageState extends State<HomePage> {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
-            
             FlatButton(
               child: Text(
                 'voltar',

@@ -45,8 +45,7 @@ class _WelcomePageState extends State<WelcomePage> {
 
   Center welcomeLabel() {
     return Center(
-      child: Text('Bem vindo ao Carona Prime',
-          style: Theme.of(context).textTheme.body2),
-    );
+        child: Text('Bem vindo ao Carona Prime',
+            style: TextStyle(color: Colors.white, fontSize: 18)));
   }
 }
