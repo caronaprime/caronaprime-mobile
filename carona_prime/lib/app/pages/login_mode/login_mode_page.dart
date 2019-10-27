@@ -1,7 +1,7 @@
 import 'package:carona_prime/app/app_module.dart';
 import 'package:carona_prime/app/enums/modo_login.dart';
 import 'package:carona_prime/app/pages/home/home_page.dart';
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 import 'login_mode_bloc.dart';
 
 class LoginModePage extends StatefulWidget {
@@ -15,7 +15,7 @@ class _LoginModePageState extends State<LoginModePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold(      
       appBar: AppBar(title: Text('Carona Prime')),
       bottomNavigationBar: BottomAppBar(
         child: Row(

@@ -1,5 +1,4 @@
 import 'package:carona_prime/app/app_module.dart';
-import 'package:carona_prime/app/pages/login_mode/login_mode_page.dart';
 import 'package:carona_prime/app/widgets/logo_carona.dart';
 import 'package:flutter/material.dart';
 import 'login_bloc.dart';
@@ -26,12 +25,27 @@ class _LoginPageState extends State<LoginPage> {
           Expanded(flex: 2, child: SizedBox()),
           Center(child: Text("Informe seu número de celular")),
           Expanded(flex: 2, child: SizedBox()),
+          code(),
           phoneTextField(),
           loginButton(),
           forgotLabel(),
           Expanded(flex: 2, child: SizedBox())
         ],
       ),
+    );
+  }
+
+  code() {
+    return StreamBuilder(
+      stream: _bloc.outStatus,
+      initialData: "",
+      builder: (context, snapshot) {
+        return Container(
+          child: snapshot.hasData
+              ? Text(snapshot.data)
+              : CircularProgressIndicator(),
+        );
+      },
     );
   }
 
@@ -47,12 +61,7 @@ class _LoginPageState extends State<LoginPage> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: RaisedButton(
-        child: Text("Entrar"),
-        onPressed: () async {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => LoginModePage()));
-        },
-      ),
+          child: Text("Entrar"), onPressed: () => _bloc.entrar(context)),
     );
   }
 
@@ -60,7 +69,8 @@ class _LoginPageState extends State<LoginPage> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
-        controller: _bloc.phoneController,
+        onChanged: (value) => _bloc.setPhoneNumber(value),
+        controller: _bloc.phoneTextController,
         keyboardType: TextInputType.phone,
         autofocus: false,
         decoration: InputDecoration(
