@@ -11,7 +11,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   var _bloc = AppModule.to.getBloc<LoginBloc>();
 
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     return Scaffold(
       appBar: AppBar(title: Text('Carona Prime')),
       body: Column(
@@ -25,9 +25,8 @@ class _LoginPageState extends State<LoginPage> {
           Expanded(flex: 2, child: SizedBox()),
           Center(child: Text("Informe seu número de celular")),
           Expanded(flex: 2, child: SizedBox()),
-          code(),
-          phoneTextField(),
-          loginButton(),
+          phoneTextField(),          
+          enviarCodigoButton(),
           forgotLabel(),
           Expanded(flex: 2, child: SizedBox())
         ],
@@ -57,17 +56,17 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  loginButton() {
+  enviarCodigoButton() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: RaisedButton(
-          child: Text("Entrar"), onPressed: () => _bloc.entrar(context)),
+          child: Text("Enviar Código"), onPressed: () => _bloc.enviarCodigo(context)),
     );
   }
 
   phoneTextField() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(8.0),
       child: TextFormField(
         onChanged: (value) => _bloc.setPhoneNumber(value),
         controller: _bloc.phoneTextController,
