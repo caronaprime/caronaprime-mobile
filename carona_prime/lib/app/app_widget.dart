@@ -7,7 +7,7 @@ class AppWidget extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Carona Prime',
-      theme: ThemeData(
+      theme: ThemeData(    
         primarySwatch: Colors.deepOrange,
         accentColor: Colors.white,        
         primaryColor: Color(0xFFe64a19),
@@ -20,7 +20,7 @@ class AppWidget extends StatelessWidget {
           labelStyle: TextStyle(fontSize: 24),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
         ),
-        buttonTheme: ButtonThemeData(
+        buttonTheme: ButtonThemeData(          
           height: 50,
           textTheme: ButtonTextTheme.accent,
           shape: RoundedRectangleBorder(            
