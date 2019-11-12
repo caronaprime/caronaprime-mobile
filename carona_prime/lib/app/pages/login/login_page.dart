@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
           Expanded(flex: 2, child: SizedBox()),
           phoneTextField(),
           enviarCodigoButton(),
-          forgotLabel(),
+          Expanded(child: forgotLabel()),
           Expanded(flex: 2, child: SizedBox())
         ],
       ),
