@@ -1,4 +1,5 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
+import 'package:carona_prime/app/pages/autocomplete/autocomplete_page.dart';
 import 'package:carona_prime/app/pages/home/home_page.dart';
 import 'package:carona_prime/app/pages/map/map_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -29,7 +30,7 @@ class LoginBloc extends BlocBase {
       FirebaseUser user = authResult.user;
       print('Usuário logado com sucesso $user');
       Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (context) => MapPage()));
+          .pushReplacement(MaterialPageRoute(builder: (context) => AutoCompletePage()));
     } catch (e) {
       print("verificaPhone ERROR: ${e.toString()}");
     }
