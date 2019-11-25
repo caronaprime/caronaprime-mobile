@@ -49,6 +49,7 @@ class _MapPageState extends State<MapPage> {
     return GoogleMap(
       mapType: MapType.normal,
       markers: _createMarker(),
+      myLocationEnabled: true,
       initialCameraPosition:
           CameraPosition(target: LatLng(_latitude, _longitude), zoom: 12),
       onMapCreated: (GoogleMapController controller) {

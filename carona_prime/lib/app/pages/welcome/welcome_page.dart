@@ -1,5 +1,5 @@
 import 'package:carona_prime/app/pages/login/login_page.dart';
-import 'package:carona_prime/app/widgets/logo_carona.dart';
+import 'package:carona_prime/app/shared/widgets/logo_carona.dart';
 import 'package:flutter/material.dart';
 
 class WelcomePage extends StatefulWidget {
