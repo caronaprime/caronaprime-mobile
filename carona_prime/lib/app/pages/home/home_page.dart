@@ -1,5 +1,4 @@
-import 'package:carona_prime/app/pages/welcome/welcome_page.dart';
-import 'package:carona_prime/app/widgets/default_drawer.dart';
+import 'package:carona_prime/app/shared/widgets/default_drawer.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {

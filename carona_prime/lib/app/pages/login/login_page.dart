@@ -1,5 +1,5 @@
 import 'package:carona_prime/app/app_module.dart';
-import 'package:carona_prime/app/widgets/logo_carona.dart';
+import 'package:carona_prime/app/shared/widgets/logo_carona.dart';
 import 'package:flutter/material.dart';
 import 'login_bloc.dart';
 
