@@ -1,6 +1,7 @@
 import 'package:carona_prime/app/app_module.dart';
+import 'package:carona_prime/app/models/local_model.dart';
+import 'package:carona_prime/app/pages/map/map_page.dart';
 import 'package:carona_prime/app/pages/novo_grupo/novo_grupo_bloc.dart';
-import 'package:carona_prime/app/shared/models/local_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:google_maps_webservice/places.dart';
@@ -55,6 +56,12 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
             },
             child: Text('Local de Destino'),
           ),
+          RaisedButton(
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) =>
+                    MapPage(_bloc.localDePartida, _bloc.localDeDestino))),
+            child: Text("Ver Mapa"),
+          )
         ],
       ),
     );
