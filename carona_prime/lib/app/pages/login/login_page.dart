@@ -22,13 +22,13 @@ class _LoginPageState extends State<LoginPage> {
             padding: const EdgeInsets.all(32.0),
             child: LogoCarona(),
           ),
-          Expanded(flex: 2, child: SizedBox()),
-          Center(child: Text("Informe seu número de celular")),
-          Expanded(flex: 2, child: SizedBox()),
+          Expanded(child: SizedBox()),
+          Expanded(child: Center(child: Text("Informe seu número de celular"))),
+          Expanded(child: SizedBox()),
           phoneTextField(),
           enviarCodigoButton(),
-          Expanded(child: forgotLabel()),
-          Expanded(flex: 2, child: SizedBox())
+          labelInformativo(),
+          Expanded(child: SizedBox())
         ],
       ),
     );
@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  FlatButton forgotLabel() {
+  FlatButton labelInformativo() {
     return FlatButton(
       child: Text('Para que servem esses dados?',
           style: TextStyle(color: Colors.black54)),

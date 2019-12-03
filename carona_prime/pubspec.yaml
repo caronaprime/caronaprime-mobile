@@ -29,6 +29,8 @@ dependencies:
   cloud_firestore: ^0.12.10+2
   geocoder: ^0.2.1
   flutter_polyline_points: ^0.1.0
+  contacts_service: ^0.3.9
+  permission: ^0.1.5
   flutter:
     sdk: flutter
 
