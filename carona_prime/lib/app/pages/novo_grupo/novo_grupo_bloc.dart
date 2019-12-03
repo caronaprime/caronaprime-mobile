@@ -1,38 +1,45 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
-import 'package:carona_prime/app/models/local_model.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:permission/permission.dart';
 
 class NovoGrupoBloc extends BlocBase {
-  LocalModel _localDePartida;
-  LocalModel _localDeDestino;
+  var _pageIndexController = BehaviorSubject<int>();
+  Observable<int> get outPageIndex => _pageIndexController.stream;
+  setIndex(int index) => _pageIndexController.sink.add(index);
 
-  var _localDePartidaController = BehaviorSubject<LocalModel>();
+  var _contactsController = BehaviorSubject<Iterable<Contact>>();
 
-  Observable<LocalModel> get outLocalDePartida =>
-      _localDePartidaController.stream;
+  Observable<Iterable<Contact>> get outContacts => _contactsController.stream;
+  void loadContacts() async {
+    var permissionNames = await Permission.requestPermissions([PermissionName.Contacts]);
 
-  void setLocalDePartida(LocalModel local) {
-    _localDePartida = local;
-    _localDePartidaController.sink.add(local);
+    // PermissionStatus permissionStatus = await _getPermission();
+    // if (permissionStatus == PermissionStatus.granted) {
+      var contacts = await ContactsService.getContacts();
+      _contactsController.sink.add(contacts);
+    // }
   }
 
-  var _localDeDestinoController = BehaviorSubject<LocalModel>();
-
-  Observable<LocalModel> get outLocalDeDestino =>
-      _localDeDestinoController.stream;
-
-  void setLocalDeDestino(LocalModel local) {
-    _localDeDestino = local;
-    _localDeDestinoController.sink.add(local);
-  }
-
-  LocalModel get localDePartida => _localDePartida;
-  LocalModel get localDeDestino => _localDeDestino;
+  // Future<PermissionStatus> _getPermission() async {
+  //   PermissionStatus permission = await PermissionHandler()
+  //       .checkPermissionStatus(PermissionGroup.contacts);
+  //   if (permission != PermissionStatus.granted &&
+  //       permission != PermissionStatus.disabled) {
+  //     Map<PermissionGroup, PermissionStatus> permisionStatus =
+  //         await PermissionHandler()
+  //             .requestPermissions([PermissionGroup.contacts]);
+  //     return permisionStatus[PermissionGroup.contacts] ??
+  //         PermissionStatus.unknown;
+  //   } else {
+  //     return permission;
+  //   }
+  // }
 
   @override
   void dispose() {
-    _localDePartidaController.close();
-    _localDeDestinoController.close();
+    _pageIndexController.close();
+    _contactsController.close();
     super.dispose();
   }
 }

@@ -1,5 +1,6 @@
-import 'package:carona_prime/app/pages/grupo/grupo_bloc.dart';
 import 'package:carona_prime/app/pages/novo_grupo/novo_grupo_bloc.dart';
+import 'package:carona_prime/app/pages/selecionar_contatos/selecionar_contatos_bloc.dart';
+import 'package:carona_prime/app/pages/grupo/grupo_bloc.dart';
 import 'package:carona_prime/app/pages/map/map_bloc.dart';
 import 'package:carona_prime/app/pages/login/login_bloc.dart';
 import 'package:carona_prime/app/pages/login_mode/login_mode_bloc.dart';
@@ -12,8 +13,10 @@ import 'package:carona_prime/app/app_bloc.dart';
 class AppModule extends ModuleWidget {
   @override
   List<Bloc> get blocs => [
-        Bloc((i) => GrupoBloc()),
         Bloc((i) => NovoGrupoBloc()),
+        Bloc((i) => SelecionarContatosBloc()),
+        Bloc((i) => GrupoBloc()),
+        Bloc((i) => SelecionarContatosBloc()),
         Bloc((i) => MapBloc()),
         Bloc((i) => LoginModeBloc()),
         Bloc((i) => LoginBloc()),
