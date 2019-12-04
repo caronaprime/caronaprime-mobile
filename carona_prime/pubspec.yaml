@@ -30,7 +30,7 @@ dependencies:
   geocoder: ^0.2.1
   flutter_polyline_points: ^0.1.0
   contacts_service: ^0.3.9
-  permission: ^0.1.5
+  simple_permissions: ^0.1.9
   flutter:
     sdk: flutter
 

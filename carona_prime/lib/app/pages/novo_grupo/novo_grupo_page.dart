@@ -4,43 +4,81 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 
 class NovoGrupoPage extends StatefulWidget {
-  final _bloc = AppModule.to.bloc<NovoGrupoBloc>();  
-  @override  
+  final _bloc = AppModule.to.bloc<NovoGrupoBloc>();
+  @override
   _NovoGrupoPageState createState() => _NovoGrupoPageState(_bloc);
 }
 
 class _NovoGrupoPageState extends State<NovoGrupoPage> {
   NovoGrupoBloc bloc;
-  _NovoGrupoPageState(this.bloc){
-    bloc.loadContacts();
+  _NovoGrupoPageState(this.bloc) {
+    bloc.loadContacts("");
   }
-  
+
   final _titles = ["Contatos", "Rotas", "Dados"];
 
   @override
   Widget build(BuildContext context) {
     var mediaQuery = MediaQuery.of(context);
     var _pages = <Widget>[
-      
       Container(
-        child: StreamBuilder<Iterable<Contact>>(
-          initialData: [],
-          builder: (context, snapshot){
-            return snapshot.hasData ? Text("Nenhum Contato Disponivel") : Text("äsdf");
-          },
-        )),
+          child: StreamBuilder<Iterable<Contact>>(
+        initialData: [],
+        stream: bloc.outContacts,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData)
+            return Center(child: Text("Nenhum contato disponível"));
 
-      // ListView.builder(
-      //   itemCount: contacts.length,
-      //   itemBuilder: (context, index) {
-      //     return ListTile(
-      //       title: Text(contacts.elementAt(index).displayName),
-      //     );
-      //   },
-      // ),
-      // width: mediaQuery.size.width,
-      // height: mediaQuery.size.height,
-      // ),
+          return Container(
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: TextField(
+                    onChanged: bloc.loadContacts,
+                    decoration: InputDecoration(
+                        labelText: "Buscar",
+                        hintText: "Buscar",
+                        suffixIcon: Icon(Icons.search)),
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    children: snapshot.data.map((contact) {
+                      var avatar = CircleAvatar(
+                        child: contact.avatar.isEmpty
+                            ? Text(contact.displayName[0])
+                            : Image.memory(contact.avatar),
+                      );
+                      return StreamBuilder<List<Contact>>(
+                          initialData: [],
+                          stream: bloc.outContatosSelecionados,
+                          builder: (ctx, snap) {
+                            var selecionado = snap.hasData && snap.data.indexOf(contact) >= 0;
+                            return ListTile(
+                                title: Text(contact.displayName),
+                                subtitle: Text(contact.identifier),
+                                selected: selecionado,
+                                trailing: Checkbox(
+                                  value: selecionado,
+                                  onChanged: (value) {
+                                    if (value) {
+                                      bloc.adicionarContatoSelecionado(contact);
+                                    } else {
+                                      bloc.removerContatoSelecionado(contact);
+                                    }
+                                  },
+                                ),
+                                leading: avatar);
+                          });
+                    }).toList(),
+                  ),
+                )
+              ],
+            ),
+          );
+        },
+      )),
       Container(
           child: Text('Index 2: School'),
           width: mediaQuery.size.width,
