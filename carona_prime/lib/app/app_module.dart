@@ -21,7 +21,7 @@ class AppModule extends ModuleWidget {
         Bloc((i) => LoginModeBloc()),
         Bloc((i) => LoginBloc()),
         Bloc((i) => WelcomeBloc()),
-        Bloc((i) => AppBloc()),
+        Bloc((i) => AppBloc())
       ];
 
   @override
