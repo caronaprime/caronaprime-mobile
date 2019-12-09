@@ -9,8 +9,22 @@ class NovoGrupoBloc extends BlocBase {
   setIndex(int index) => _pageIndexController.sink.add(index);
   var contatosSelecionados = List<Contact>();
 
-  var _contactsController = BehaviorSubject<Iterable<Contact>>();
-  Observable<Iterable<Contact>> get outContacts => _contactsController.stream;
+  Iterable<Contact> _todosContatos = List<Contact>();
+  Iterable<Contact> _contatosFiltrados = List<Contact>();
+
+  var _contatosFiltradosController = BehaviorSubject<Iterable<Contact>>();
+  Observable<Iterable<Contact>> get outContatosFiltrados =>
+      _contatosFiltradosController.stream;
+
+  void filtrarContatos(String query) {
+    if (query.isEmpty) {
+      _contatosFiltradosController.sink.add(_todosContatos);
+    } else {
+      _contatosFiltrados = _todosContatos
+          .where((contact) => contact.displayName.toUpperCase().contains(query.toUpperCase()));
+      _contatosFiltradosController.sink.add(_contatosFiltrados);
+    }
+  }
 
   var _contatosSelecionadosController = BehaviorSubject<List<Contact>>();
   Observable<List<Contact>> get outContatosSelecionados =>
@@ -20,8 +34,8 @@ class NovoGrupoBloc extends BlocBase {
     try {
       await SimplePermissions.requestPermission(Permission.ReadContacts);
       if (await SimplePermissions.checkPermission(Permission.ReadContacts)) {
-        var contacts = await ContactsService.getContacts(query: query);
-        _contactsController.sink.add(contacts);
+        _todosContatos = await ContactsService.getContacts(query: query);
+        filtrarContatos(query);
       }
     } catch (e) {
       print(e.toString());
@@ -41,8 +55,8 @@ class NovoGrupoBloc extends BlocBase {
   @override
   void dispose() {
     _pageIndexController.close();
-    _contactsController.close();
     _contatosSelecionadosController.close();
+    _contatosFiltradosController.close();
     super.dispose();
   }
 }

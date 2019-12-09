@@ -15,70 +15,11 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
     bloc.loadContacts("");
   }
 
-  final _titles = ["Contatos", "Rotas", "Dados"];
-
   @override
   Widget build(BuildContext context) {
     var mediaQuery = MediaQuery.of(context);
-    var _pages = <Widget>[
-      Container(
-          child: StreamBuilder<Iterable<Contact>>(
-        initialData: [],
-        stream: bloc.outContacts,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData)
-            return Center(child: Text("Nenhum contato disponível"));
-
-          return Container(
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(8),
-                  child: TextField(
-                    onChanged: bloc.loadContacts,
-                    decoration: InputDecoration(
-                        labelText: "Buscar",
-                        hintText: "Buscar",
-                        suffixIcon: Icon(Icons.search)),
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    children: snapshot.data.map((contact) {
-                      var avatar = CircleAvatar(
-                        child: contact.avatar.isEmpty
-                            ? Text(contact.displayName[0])
-                            : Image.memory(contact.avatar),
-                      );
-                      return StreamBuilder<List<Contact>>(
-                          initialData: [],
-                          stream: bloc.outContatosSelecionados,
-                          builder: (ctx, snap) {
-                            var selecionado = snap.hasData && snap.data.indexOf(contact) >= 0;
-                            return ListTile(
-                                title: Text(contact.displayName),
-                                subtitle: Text(contact.identifier),
-                                selected: selecionado,
-                                trailing: Checkbox(
-                                  value: selecionado,
-                                  onChanged: (value) {
-                                    if (value) {
-                                      bloc.adicionarContatoSelecionado(contact);
-                                    } else {
-                                      bloc.removerContatoSelecionado(contact);
-                                    }
-                                  },
-                                ),
-                                leading: avatar);
-                          });
-                    }).toList(),
-                  ),
-                )
-              ],
-            ),
-          );
-        },
-      )),
+    var list = <Widget>[
+      pageSelecionarContatos(),
       Container(
           child: Text('Index 2: School'),
           width: mediaQuery.size.width,
@@ -89,6 +30,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
         height: mediaQuery.size.height,
       )
     ];
+    var _pages = list;
 
     return Scaffold(
       appBar: AppBar(
@@ -123,5 +65,68 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
         ),
       ),
     );
+  }
+
+  pageSelecionarContatos() {
+    return Container(
+        child: StreamBuilder<Iterable<Contact>>(
+      initialData: [],
+      stream: bloc.outContatosFiltrados,
+      builder: (_, snapshot) {
+        if (!snapshot.hasData)
+          return Center(child: Text("Nenhum contato disponível"));
+
+        return Container(
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: TextField(
+                  onChanged: bloc.filtrarContatos,
+                  decoration: InputDecoration(
+                      labelText: "Buscar",
+                      hintText: "Buscar",
+                      suffixIcon: Icon(Icons.search)),
+                ),
+              ),
+              Expanded(
+                  child: StreamBuilder<List<Contact>>(
+                stream: bloc.outContatosSelecionados,
+                initialData: [],
+                builder: (_, snapContatosSelecionados) {
+                  return ListView(
+                    children: snapshot.data.map((contact) {
+                      var avatar = CircleAvatar(
+                        child: contact.avatar.isEmpty
+                            ? Text(contact.displayName[0])
+                            : Image.memory(contact.avatar),
+                      );
+                      return ListTile(
+                          title: Text(contact.displayName),
+                          subtitle: Text(contact.phones.first.value),
+                          trailing: Checkbox(
+                            checkColor: Theme.of(context).primaryColor,
+                            value: snapContatosSelecionados.hasData &&
+                                snapContatosSelecionados.data
+                                        .indexOf(contact) >=
+                                    0,
+                            onChanged: (value) {
+                              if (value) {
+                                bloc.adicionarContatoSelecionado(contact);
+                              } else {
+                                bloc.removerContatoSelecionado(contact);
+                              }
+                            },
+                          ),
+                          leading: avatar);
+                    }).toList(),
+                  );
+                },
+              ))
+            ],
+          ),
+        );
+      },
+    ));
   }
 }
