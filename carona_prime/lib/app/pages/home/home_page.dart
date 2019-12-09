@@ -12,28 +12,6 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(title: Text('Carona Prime')),
       drawer: DefaultDrawer(),
-      // bottomNavigationBar: BottomAppBar(
-      //     child: Row(
-      //   mainAxisSize: MainAxisSize.max,
-      //   mainAxisAlignment: MainAxisAlignment.end,
-      //   children: <Widget>[
-      //     FlatButton(
-      //       child: Text(
-      //         'Voltar',
-      //         style: TextStyle(
-      //           color: Colors.white,
-      //           fontSize: 20.0,
-      //         ),
-      //       ),
-      //       onPressed: () {
-      //         Navigator.push(context,
-      //             MaterialPageRoute(builder: (context) => WelcomePage()));
-      //       },
-      //     ),
-      //   ],
-      // )),
-     
-
       body: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

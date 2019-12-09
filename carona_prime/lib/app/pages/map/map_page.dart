@@ -25,21 +25,6 @@ class _MapPageState extends State<MapPage> {
     bloc.loadPolyCordinates(localDePartida, localDeDestino);
   }
 
-  Set<Marker> _createMarker() {
-    return <Marker>[
-      Marker(
-          markerId: MarkerId(localDePartida.nome),
-          position: LatLng(localDePartida.latitude, localDePartida.longitude),
-          icon: BitmapDescriptor.defaultMarker,
-          infoWindow: InfoWindow(title: localDePartida.nome)),
-      Marker(
-          markerId: MarkerId(localDeDestino.nome),
-          position: LatLng(localDeDestino.latitude, localDeDestino.longitude),
-          icon: BitmapDescriptor.defaultMarker,
-          infoWindow: InfoWindow(title: localDeDestino.nome))
-    ].toSet();
-  }
-
   Set<Polyline> _createPolylines() {
     return <Polyline>[
       Polyline(
@@ -64,28 +49,8 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Map"),
-      ),
-      body: StreamBuilder<Set<Polyline>>(
-        stream: bloc.outPoints,
-        builder: (context, snapshot) {
-          return snapshot.hasData
-              ? GoogleMap(
-                  mapType: MapType.normal,
-                  markers: _createMarker(),
-                  polylines: snapshot.data,
-                  myLocationEnabled: true,
-                  initialCameraPosition: CameraPosition(
-                      target: LatLng(
-                          localDePartida.latitude, localDePartida.longitude),
-                      zoom: 12),
-                )
-              : CircularProgressIndicator(
-                  backgroundColor: Colors.black,
-                );
-        },
-      ),
-    );
+        appBar: AppBar(
+      title: Text("Map"),
+    ));
   }
 }
