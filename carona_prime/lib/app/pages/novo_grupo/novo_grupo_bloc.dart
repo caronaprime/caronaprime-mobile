@@ -1,7 +1,9 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:carona_prime/app/models/local_model.dart';
+import 'package:carona_prime/app/pages/novo_grupo/mapa_viewmodel.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:rxdart/rxdart.dart';
@@ -13,6 +15,7 @@ class NovoGrupoBloc extends BlocBase {
   var nomeGrupoTextController = TextEditingController();
   Marker _markerPartida;
   Marker _markerDestino;
+  MapaViewModel _mapa = MapaViewModel();
 
   var _pageIndexController = BehaviorSubject<int>();
   Observable<int> get outPageIndex => _pageIndexController.stream;
@@ -123,11 +126,11 @@ class NovoGrupoBloc extends BlocBase {
   LocalModel get localDePartida => _localDePartida;
   LocalModel get localDeDestino => _localDeDestino;
 
-  var _pointsController = BehaviorSubject<Set<Polyline>>();
-  Observable<Set<Polyline>> get outPoints => _pointsController.stream;
+  var _pointsController = BehaviorSubject<List<LatLng>>();
+  Observable<List<LatLng>> get outPoints => _pointsController.stream;
 
-  var _markersController = BehaviorSubject<Set<Marker>>();
-  Observable<Set<Marker>> get outMarkers => _markersController.stream;
+  var _mapaController = BehaviorSubject<MapaViewModel>();
+  Observable<MapaViewModel> get outMapa => _mapaController.stream;
 
   @override
   void dispose() {
@@ -137,16 +140,38 @@ class NovoGrupoBloc extends BlocBase {
     _localDeDestinoController.close();
     _localDePartidaController.close();
     _pointsController.close();
-    _markersController.close();
+    _mapaController.close();
     _posicaoInicialController.close();
     _nomeGrupoController.close();
     super.dispose();
   }
 
-  void loadMarkers() {
+  Future loadPoints() async {
+    if (_localDePartida == null || _localDeDestino == null) return;
+
+    PolylinePoints polylinePoints = PolylinePoints();
+    var points = await polylinePoints.getRouteBetweenCoordinates(
+        "AIzaSyDny8aAA0AA9LBWNAkNONtTwVLFJz7u6Fo",
+        _localDePartida.latitude,
+        _localDePartida.longitude,
+        _localDeDestino.latitude,
+        _localDeDestino.longitude);
+
+    var latLongs = List<LatLng>();
+    for (var point in points) {
+      latLongs.add(LatLng(point.latitude, point.longitude));
+    }
+    _mapa.polyLinePoints = latLongs;
+  }
+
+  Future loadPointsAndMarkers() async {
     var markers = List<Marker>();
     if (_markerPartida != null) markers.add(_markerPartida);
     if (_markerDestino != null) markers.add(_markerDestino);
-    _markersController.sink.add(markers.toSet());
+
+    await loadPoints();
+
+    _mapa.markers = markers.toSet();
+    _mapaController.sink.add(_mapa);
   }
 }

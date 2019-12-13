@@ -1,5 +1,6 @@
 import 'package:carona_prime/app/app_module.dart';
 import 'package:carona_prime/app/models/local_model.dart';
+import 'package:carona_prime/app/pages/novo_grupo/mapa_viewmodel.dart';
 import 'package:carona_prime/app/pages/novo_grupo/novo_grupo_bloc.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
@@ -140,17 +141,31 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
       top: 0,
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
-        height: 150,
+        height: 170,
         child: Container(
-          color: Theme.of(context).accentColor.withOpacity(0.7),
           child: Column(
             children: <Widget>[
-              editSelecionarPartida(),
-              editSelecionarDestino()
+              modeloInput(editSelecionarPartida()),
+              modeloInput(editSelecionarDestino())
             ],
           ),
         ),
       ),
+    );
+  }
+
+  modeloInput(Widget child) {
+    var borderRadius = BorderRadius.circular(10);
+    var themeBorder =
+        Theme.of(context).inputDecorationTheme.border as OutlineInputBorder;
+    if (themeBorder != null) borderRadius = themeBorder.borderRadius;
+
+    return Padding(
+      padding: EdgeInsets.all(8),
+      child: Container(
+          decoration: BoxDecoration(
+              borderRadius: borderRadius, color: Theme.of(context).accentColor),
+          child: child),
     );
   }
 
@@ -177,56 +192,50 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   }
 
   editSelecionarDestino() {
-    return Padding(
-      padding: EdgeInsets.all(8),
-      child: StreamBuilder<LocalModel>(
-        stream: bloc.outLocalDeDestino,
-        builder: (context, snapshot) {
-          return TextField(
-            controller: bloc.localDestinoTextController,
-            onTap: () async {
-              Prediction p = await PlacesAutocomplete.show(
-                  context: context, apiKey: kGoogleApiKey);
+    return StreamBuilder<LocalModel>(
+      stream: bloc.outLocalDeDestino,
+      builder: (context, snapshot) {
+        return TextField(
+          controller: bloc.localDestinoTextController,
+          onTap: () async {
+            Prediction p = await PlacesAutocomplete.show(
+                context: context, apiKey: kGoogleApiKey);
 
-              var _local = await exibirPaginaDePesquisa(p);
-              bloc.setLocalDeDestino(_local);
-              bloc.loadMarkers();
-            },
-            onChanged: bloc.filtrarContatos,
-            decoration: InputDecoration(
-                labelText: "Selecionar Destino",
-                hintText: "Selecionar Destino",
-                suffixIcon: Icon(Icons.search)),
-          );
-        },
-      ),
+            var _local = await exibirPaginaDePesquisa(p);
+            bloc.setLocalDeDestino(_local);
+            bloc.loadPointsAndMarkers();
+          },
+          onChanged: bloc.filtrarContatos,
+          decoration: InputDecoration(
+              labelText: "Selecionar Destino",
+              hintText: "Selecionar Destino",
+              suffixIcon: Icon(Icons.search)),
+        );
+      },
     );
   }
 
   editSelecionarPartida() {
-    return Padding(
-      padding: EdgeInsets.all(8),
-      child: StreamBuilder<LocalModel>(
-        stream: bloc.outLocalDePartida,
-        builder: (context, snapshot) {
-          return TextField(
-            controller: bloc.localPartidaTextController,
-            onTap: () async {
-              Prediction p = await PlacesAutocomplete.show(
-                  context: context, apiKey: kGoogleApiKey);
+    return StreamBuilder<LocalModel>(
+      stream: bloc.outLocalDePartida,
+      builder: (context, snapshot) {
+        return TextField(
+          controller: bloc.localPartidaTextController,
+          onTap: () async {
+            Prediction p = await PlacesAutocomplete.show(
+                context: context, apiKey: kGoogleApiKey);
 
-              var _local = await exibirPaginaDePesquisa(p);
-              bloc.setLocalDePartida(_local);
-              bloc.loadMarkers();
-            },
-            onChanged: bloc.filtrarContatos,
-            decoration: InputDecoration(
-                labelText: "Selecionar Partida",
-                hintText: "Selecionar Partida",
-                suffixIcon: Icon(Icons.search)),
-          );
-        },
-      ),
+            var _local = await exibirPaginaDePesquisa(p);
+            bloc.setLocalDePartida(_local);
+            bloc.loadPointsAndMarkers();
+          },
+          onChanged: bloc.filtrarContatos,
+          decoration: InputDecoration(
+              labelText: "Partida",
+              hintText: "Selecionar Partida",
+              suffixIcon: Icon(Icons.search)),
+        );
+      },
     );
   }
 
@@ -254,12 +263,24 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
         });
   }
 
+  ListTile listTileContact(Contact contact) {
+    var avatar = CircleAvatar(
+      child: contact.avatar.isEmpty
+          ? Text(contact.displayName[0])
+          : Image.memory(contact.avatar),
+    );
+    return ListTile(
+        title: Text(contact.displayName),
+        subtitle: Text(contact.phones.first.value),
+        leading: avatar);
+  }
+
   mapa() {
     return Container(
-      child: StreamBuilder<Set<Marker>>(
-          stream: bloc.outMarkers,
+      child: StreamBuilder<MapaViewModel>(
+          stream: bloc.outMapa,
           builder: (_, snapshot) {
-            if (!snapshot.hasData || snapshot.data.length == 0)
+            if (!snapshot.hasData || snapshot.data.markers.length == 0)
               return mapaInicial();
 
             return GoogleMap(
@@ -267,18 +288,18 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
               polylines: [
-                Polyline(points: [
-                  LatLng(snapshot.data.first.position.latitude,
-                      snapshot.data.first.position.longitude),
-                  LatLng(snapshot.data.last.position.latitude,
-                      snapshot.data.last.position.longitude)
-                ], polylineId: PolylineId(snapshot.data.first.markerId.value)),
+                Polyline(
+                  width: 5,
+                  color: Colors.blue,
+                    polylineId:
+                        PolylineId(snapshot.data.markers.first.markerId.value),
+                    points: snapshot.data.polyLinePoints)
               ].toSet(),
               initialCameraPosition: CameraPosition(
-                  target: LatLng(snapshot.data.first.position.latitude,
-                      snapshot.data.first.position.longitude),
+                  target: LatLng(snapshot.data.markers.first.position.latitude,
+                      snapshot.data.markers.first.position.longitude),
                   zoom: 14),
-              markers: snapshot.data,
+              markers: snapshot.data.markers,
             );
           }),
     );
@@ -294,6 +315,43 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
             controller: bloc.nomeGrupoTextController,
             onChanged: bloc.setNomeGrupo,
             decoration: InputDecoration(labelText: "Nome"),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                StreamBuilder<LocalModel>(
+                    stream: bloc.outLocalDePartida,
+                    builder: (_, snapshot) {
+                      if (!snapshot.hasData)
+                        return Text("Origem não informada");
+                      return Text("Origem: " + snapshot.data.nome);
+                    }),
+                StreamBuilder<LocalModel>(
+                    stream: bloc.outLocalDeDestino,
+                    builder: (_, snapshot) {
+                      if (!snapshot.hasData)
+                        return Text("Destino não informado");
+                      return Text("Destino: " + snapshot.data.nome);
+                    }),
+              ],
+            )),
+          ),
+          Container(
+            child: Expanded(
+                child: StreamBuilder<List<Contact>>(
+              stream: bloc.outContatosSelecionados,
+              initialData: [],
+              builder: (_, snapshot) {
+                return ListView(
+                  children: snapshot.data.map((contact) {
+                    return listTileContact(contact);
+                  }).toList(),
+                );
+              },
+            )),
           ),
           Container(
             child: Row(
