@@ -1,6 +1,6 @@
 import 'package:carona_prime/app/app_module.dart';
 import 'package:carona_prime/app/models/local_model.dart';
-import 'package:carona_prime/app/pages/novo_grupo/mapa_viewmodel.dart';
+import 'package:carona_prime/app/pages/novo_grupo/grupo_viewmodel.dart';
 import 'package:carona_prime/app/pages/novo_grupo/novo_grupo_bloc.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
@@ -35,22 +35,21 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
 
     return Scaffold(
       appBar: AppBar(
-          title: StreamBuilder<String>(
-        stream: bloc.outNomeGrupo,
-        initialData: "Cadastro de Grupo",
+          title: StreamBuilder<GrupoViewModel>(
+        stream: bloc.outGrupo,
+        initialData: GrupoViewModel(),
         builder: (_, snapshot) {
-          return Text(snapshot.data);
+          return Text(snapshot.data.nome);
         },
       )),
-      body: StreamBuilder<int>(
-        initialData: 0,
-        stream: bloc.outPageIndex,
-        builder: (context, snapshot) =>
-            Container(child: _pages.elementAt(snapshot.data)),
-      ),
-      bottomNavigationBar: StreamBuilder(
-        initialData: 0,
-        stream: bloc.outPageIndex,
+      body: StreamBuilder<GrupoViewModel>(
+          initialData: GrupoViewModel(),
+          stream: bloc.outGrupo,
+          builder: (context, snapshot) =>
+              Container(child: _pages.elementAt(snapshot.data.pageIndex))),
+      bottomNavigationBar: StreamBuilder<GrupoViewModel>(
+        initialData: GrupoViewModel(),
+        stream: bloc.outGrupo,
         builder: (context, snapshot) => BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
@@ -67,7 +66,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
             ),
           ],
           onTap: bloc.setIndex,
-          currentIndex: snapshot.data,
+          currentIndex: snapshot.data.pageIndex,
         ),
       ),
     );
@@ -75,9 +74,9 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
 
   pageSelecionarContatos() {
     return Container(
-        child: StreamBuilder<Iterable<Contact>>(
-      initialData: [],
-      stream: bloc.outContatosFiltrados,
+        child: StreamBuilder<GrupoViewModel>(
+      initialData: GrupoViewModel(),
+      stream: bloc.outGrupo,
       builder: (_, snapshot) {
         if (!snapshot.hasData)
           return Center(child: Text("Nenhum contato disponível"));
@@ -96,12 +95,12 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                 ),
               ),
               Expanded(
-                  child: StreamBuilder<List<Contact>>(
-                stream: bloc.outContatosSelecionados,
-                initialData: [],
+                  child: StreamBuilder<GrupoViewModel>(
+                stream: bloc.outGrupo,
+                initialData: GrupoViewModel(),
                 builder: (_, snapContatosSelecionados) {
                   return ListView(
-                    children: snapshot.data.map((contact) {
+                    children: snapshot.data.contatosFiltrados.map((contact) {
                       var avatar = CircleAvatar(
                         child: contact.avatar.isEmpty
                             ? Text(contact.displayName[0])
@@ -113,7 +112,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                           trailing: Checkbox(
                             checkColor: Theme.of(context).primaryColor,
                             value: snapContatosSelecionados.hasData &&
-                                snapContatosSelecionados.data
+                                snapContatosSelecionados
+                                        .data.contatosSelecionados
                                         .indexOf(contact) >=
                                     0,
                             onChanged: (value) {
@@ -192,8 +192,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   }
 
   editSelecionarDestino() {
-    return StreamBuilder<LocalModel>(
-      stream: bloc.outLocalDeDestino,
+    return StreamBuilder<GrupoViewModel>(
+      stream: bloc.outGrupo,
       builder: (context, snapshot) {
         return TextField(
           controller: bloc.localDestinoTextController,
@@ -216,8 +216,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   }
 
   editSelecionarPartida() {
-    return StreamBuilder<LocalModel>(
-      stream: bloc.outLocalDePartida,
+    return StreamBuilder<GrupoViewModel>(
+      stream: bloc.outGrupo,
       builder: (context, snapshot) {
         return TextField(
           controller: bloc.localPartidaTextController,
@@ -240,8 +240,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   }
 
   mapaInicial() {
-    return StreamBuilder<LocalModel>(
-        stream: bloc.outPosicaoInicial,
+    return StreamBuilder<GrupoViewModel>(
+        stream: bloc.outGrupo,
         builder: (context, snapshot) {
           if (!snapshot.hasData)
             return GoogleMap(
@@ -257,7 +257,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
             initialCameraPosition: CameraPosition(
-                target: LatLng(snapshot.data.latitude, snapshot.data.longitude),
+                target: LatLng(snapshot.data.posicaoInicial.latitude,
+                    snapshot.data.posicaoInicial.longitude),
                 zoom: 12),
           );
         });
@@ -277,8 +278,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
 
   mapa() {
     return Container(
-      child: StreamBuilder<MapaViewModel>(
-          stream: bloc.outMapa,
+      child: StreamBuilder<GrupoViewModel>(
+          stream: bloc.outGrupo,
           builder: (_, snapshot) {
             if (!snapshot.hasData || snapshot.data.markers.length == 0)
               return mapaInicial();
@@ -289,8 +290,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
               myLocationButtonEnabled: true,
               polylines: [
                 Polyline(
-                  width: 5,
-                  color: Colors.blue,
+                    width: 5,
+                    color: Theme.of(context).primaryColor,
                     polylineId:
                         PolylineId(snapshot.data.markers.first.markerId.value),
                     points: snapshot.data.polyLinePoints)
@@ -322,15 +323,15 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                 child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                StreamBuilder<LocalModel>(
-                    stream: bloc.outLocalDePartida,
+                StreamBuilder<GrupoViewModel>(
+                    stream: bloc.outGrupo,
                     builder: (_, snapshot) {
                       if (!snapshot.hasData)
                         return Text("Origem não informada");
                       return Text("Origem: " + snapshot.data.nome);
                     }),
-                StreamBuilder<LocalModel>(
-                    stream: bloc.outLocalDeDestino,
+                StreamBuilder<GrupoViewModel>(
+                    stream: bloc.outGrupo,
                     builder: (_, snapshot) {
                       if (!snapshot.hasData)
                         return Text("Destino não informado");
@@ -341,12 +342,12 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
           ),
           Container(
             child: Expanded(
-                child: StreamBuilder<List<Contact>>(
-              stream: bloc.outContatosSelecionados,
-              initialData: [],
+                child: StreamBuilder<GrupoViewModel>(
+              stream: bloc.outGrupo,
+              initialData: GrupoViewModel(),
               builder: (_, snapshot) {
                 return ListView(
-                  children: snapshot.data.map((contact) {
+                  children: snapshot.data.contatosSelecionados.map((contact) {
                     return listTileContact(contact);
                   }).toList(),
                 );
