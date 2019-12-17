@@ -24,6 +24,18 @@ class NovoGrupoBloc extends BlocBase {
     _grupoController.sink.add(_grupoViewModel);
   }
 
+  void cancelar() {
+    _grupoViewModel = GrupoViewModel();
+    loadContacts("");
+
+    buscarContatosTextController.clear();
+    localDestinoTextController.clear();
+    localPartidaTextController.clear();
+    nomeGrupoTextController.clear();
+
+    _grupoController.sink.add(_grupoViewModel);
+  }
+
   setIndex(int index) {
     _grupoViewModel.pageIndex = index;
     _grupoController.sink.add(_grupoViewModel);
@@ -106,7 +118,8 @@ class NovoGrupoBloc extends BlocBase {
   LocalModel get localDeDestino => _grupoViewModel.localDeDestino;
 
   Future loadPoints() async {
-    if (_grupoViewModel.localDePartida == null || _grupoViewModel.localDeDestino == null) return;
+    if (_grupoViewModel.localDePartida == null ||
+        _grupoViewModel.localDeDestino == null) return;
 
     PolylinePoints polylinePoints = PolylinePoints();
     var points = await polylinePoints.getRouteBetweenCoordinates(

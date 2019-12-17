@@ -9,19 +9,20 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 
 class NovoGrupoPage extends StatefulWidget {
-  final _bloc = AppModule.to.bloc<NovoGrupoBloc>();
   @override
-  _NovoGrupoPageState createState() => _NovoGrupoPageState(_bloc);
+  _NovoGrupoPageState createState() => _NovoGrupoPageState();
 }
 
 class _NovoGrupoPageState extends State<NovoGrupoPage> {
-  NovoGrupoBloc bloc;
   static String kGoogleApiKey = "AIzaSyDny8aAA0AA9LBWNAkNONtTwVLFJz7u6Fo";
   GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
+  final bloc = AppModule.to.bloc<NovoGrupoBloc>();
 
-  _NovoGrupoPageState(this.bloc) {
+  @override
+  void initState() {
     bloc.loadContacts("");
     bloc.loadPosicaoInicial();
+    super.initState();
   }
 
   @override
@@ -69,7 +70,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                 children: <Widget>[
                   Padding(
                     padding: EdgeInsets.all(8),
-                    child: TextFormField(
+                    child: TextField(
                       controller: bloc.buscarContatosTextController,
                       onChanged: bloc.filtrarContatos,
                       decoration: InputDecoration(
@@ -168,17 +169,18 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   }
 
   editSelecionarDestino() {
-    return TextFormField(
+    return TextField(
       controller: bloc.localDestinoTextController,
       onTap: () async {
         Prediction p = await PlacesAutocomplete.show(
             context: context, apiKey: kGoogleApiKey);
 
         var _local = await exibirPaginaDePesquisa(p);
-        bloc.setLocalDeDestino(_local);
-        bloc.loadPointsAndMarkers();
+        if (_local != null) {
+          bloc.setLocalDeDestino(_local);
+          bloc.loadPointsAndMarkers();
+        }
       },
-      onChanged: bloc.filtrarContatos,
       decoration: InputDecoration(
           labelText: "Selecionar Destino",
           hintText: "Selecionar Destino",
@@ -187,17 +189,18 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   }
 
   editSelecionarPartida() {
-    return TextFormField(
+    return TextField(
       controller: bloc.localPartidaTextController,
       onTap: () async {
         Prediction p = await PlacesAutocomplete.show(
             context: context, apiKey: kGoogleApiKey);
 
         var _local = await exibirPaginaDePesquisa(p);
-        bloc.setLocalDePartida(_local);
-        bloc.loadPointsAndMarkers();
+        if (_local != null) {
+          bloc.setLocalDePartida(_local);
+          bloc.loadPointsAndMarkers();
+        }
       },
-      onChanged: bloc.filtrarContatos,
       decoration: InputDecoration(
           labelText: "Partida",
           hintText: "Selecionar Partida",
@@ -239,7 +242,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
 
   mapa(GrupoViewModel grupo) {
     return Container(
-        child: grupo.markers.length == 0
+        child: grupo.markers != null || grupo.markers.length == 0
             ? mapaInicial(grupo)
             : GoogleMap(
                 mapToolbarEnabled: true,
@@ -267,7 +270,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: <Widget>[
-          TextFormField(
+          TextField(
             controller: bloc.nomeGrupoTextController,
             onChanged: bloc.setNomeGrupo,
             decoration: InputDecoration(labelText: "Nome"),
@@ -305,7 +308,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                     padding: const EdgeInsets.all(8.0),
                     child: RaisedButton(
                       color: Theme.of(context).disabledColor,
-                      onPressed: () {},
+                      onPressed: bloc.cancelar,
                       child: Text("Cancelar"),
                     ),
                   ),
