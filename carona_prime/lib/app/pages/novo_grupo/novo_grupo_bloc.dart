@@ -14,6 +14,7 @@ class NovoGrupoBloc extends BlocBase {
   var localPartidaTextController = TextEditingController();
   var localDestinoTextController = TextEditingController();
   var nomeGrupoTextController = TextEditingController();
+  var buscarContatosTextController = TextEditingController();
 
   var _grupoController = BehaviorSubject<GrupoViewModel>();
   Observable<GrupoViewModel> get outGrupo => _grupoController.stream;
