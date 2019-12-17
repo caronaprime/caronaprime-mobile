@@ -11,6 +11,9 @@ class LoginBloc extends BlocBase {
   var phoneTextController = TextEditingController();
   var codeTextController = TextEditingController();
 
+  var _logadoBehavior = BehaviorSubject<bool>();
+  Stream<bool> get outLogado => _logadoBehavior.stream;
+
   var _phoneNumberBehavior = BehaviorSubject<String>();
   Stream<String> get outPhoneNumber => _phoneNumberBehavior.stream;
 
@@ -26,8 +29,10 @@ class LoginBloc extends BlocBase {
           verificationId: _verificationId, smsCode: smsCode);
 
       AuthResult authResult = await _auth.signInWithCredential(credential);
-      FirebaseUser user = authResult.user;
+      FirebaseUser user = authResult.user;  
       print('Usuário logado com sucesso $user');
+      _logadoBehavior.sink.add(true);
+
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => GrupoPage()));
     } catch (e) {
@@ -40,6 +45,7 @@ class LoginBloc extends BlocBase {
     _phoneNumberBehavior.close();
     _codeNumberBehavior.close();
     _statusBehavior.close();
+    _logadoBehavior.close();
     super.dispose();
   }
 

@@ -26,114 +26,90 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
 
   @override
   Widget build(BuildContext context) {
-    var list = <Widget>[
-      pageSelecionarContatos(),
-      pageSelecionarRota(),
-      paginaDados(),
-    ];
-    var _pages = list;
-
-    return Scaffold(
-      appBar: AppBar(
-          title: StreamBuilder<GrupoViewModel>(
+    return StreamBuilder<GrupoViewModel>(
         stream: bloc.outGrupo,
         initialData: GrupoViewModel(),
         builder: (_, snapshot) {
-          return Text(snapshot.data.nome);
-        },
-      )),
-      body: StreamBuilder<GrupoViewModel>(
-          initialData: GrupoViewModel(),
-          stream: bloc.outGrupo,
-          builder: (context, snapshot) =>
-              Container(child: _pages.elementAt(snapshot.data.pageIndex))),
-      bottomNavigationBar: StreamBuilder<GrupoViewModel>(
-        initialData: GrupoViewModel(),
-        stream: bloc.outGrupo,
-        builder: (context, snapshot) => BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.contacts),
-              title: Text('Contatos'),
+          return Scaffold(
+            appBar: AppBar(title: Text(snapshot.data.nome)),
+            body: Container(
+                child: <Widget>[
+              pageSelecionarContatos(snapshot.data),
+              pageSelecionarRota(snapshot.data),
+              paginaDados(snapshot.data),
+            ].elementAt(snapshot.data.pageIndex)),
+            bottomNavigationBar: BottomNavigationBar(
+              items: <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.contacts),
+                  title: Text('Contatos'),
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.map),
+                  title: Text('Rotas'),
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.create),
+                  title: Text('Dados'),
+                ),
+              ],
+              onTap: bloc.setIndex,
+              currentIndex: snapshot.data.pageIndex,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.map),
-              title: Text('Rotas'),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.create),
-              title: Text('Dados'),
-            ),
-          ],
-          onTap: bloc.setIndex,
-          currentIndex: snapshot.data.pageIndex,
-        ),
-      ),
-    );
+          );
+        });
   }
 
-  pageSelecionarContatos() {
+  pageSelecionarContatos(GrupoViewModel grupo) {
     return Container(
-        child: StreamBuilder<GrupoViewModel>(
-      initialData: GrupoViewModel(),
-      stream: bloc.outGrupo,
-      builder: (_, snapshot) {
-        if (!snapshot.hasData)
-          return Center(child: Text("Nenhum contato disponível"));
-
-        return Container(
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.all(8),
-                child: TextField(
-                  onChanged: bloc.filtrarContatos,
-                  decoration: InputDecoration(
-                      labelText: "Buscar",
-                      hintText: "Buscar",
-                      suffixIcon: Icon(Icons.search)),
-                ),
+      child: grupo.contatosFiltrados == null
+          ? Center(child: Text("Nenhum contato disponível"))
+          : Container(
+              child: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(8),
+                    child: TextFormField(
+                      controller: bloc.buscarContatosTextController,
+                      onChanged: bloc.filtrarContatos,
+                      decoration: InputDecoration(
+                          labelText: "Buscar",
+                          hintText: "Buscar",
+                          suffixIcon: Icon(Icons.search)),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView(
+                      children: grupo.contatosFiltrados.map((contact) {
+                        var avatar = CircleAvatar(
+                          child: contact.avatar.isEmpty
+                              ? Text(contact.displayName[0])
+                              : Image.memory(contact.avatar),
+                        );
+                        return ListTile(
+                            title: Text(contact.displayName),
+                            subtitle: Text(contact.phones.first.value),
+                            trailing: Checkbox(
+                              checkColor: Theme.of(context).primaryColor,
+                              value: grupo.contatosSelecionados != null &&
+                                  grupo.contatosSelecionados.indexOf(contact) >=
+                                      0,
+                              onChanged: (value) {
+                                if (value) {
+                                  bloc.adicionarContatoSelecionado(contact);
+                                } else {
+                                  bloc.removerContatoSelecionado(contact);
+                                }
+                              },
+                            ),
+                            leading: avatar);
+                      }).toList(),
+                    ),
+                  )
+                ],
               ),
-              Expanded(
-                  child: StreamBuilder<GrupoViewModel>(
-                stream: bloc.outGrupo,
-                initialData: GrupoViewModel(),
-                builder: (_, snapContatosSelecionados) {
-                  return ListView(
-                    children: snapshot.data.contatosFiltrados.map((contact) {
-                      var avatar = CircleAvatar(
-                        child: contact.avatar.isEmpty
-                            ? Text(contact.displayName[0])
-                            : Image.memory(contact.avatar),
-                      );
-                      return ListTile(
-                          title: Text(contact.displayName),
-                          subtitle: Text(contact.phones.first.value),
-                          trailing: Checkbox(
-                            checkColor: Theme.of(context).primaryColor,
-                            value: snapContatosSelecionados.hasData &&
-                                snapContatosSelecionados
-                                        .data.contatosSelecionados
-                                        .indexOf(contact) >=
-                                    0,
-                            onChanged: (value) {
-                              if (value) {
-                                bloc.adicionarContatoSelecionado(contact);
-                              } else {
-                                bloc.removerContatoSelecionado(contact);
-                              }
-                            },
-                          ),
-                          leading: avatar);
-                    }).toList(),
-                  );
-                },
-              ))
-            ],
-          ),
-        );
-      },
-    ));
+            ),
+    );
   }
 
   inputsLocalizacao() {
@@ -169,13 +145,13 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
     );
   }
 
-  pageSelecionarRota() {
+  pageSelecionarRota(GrupoViewModel grupo) {
     return Container(
         child: Center(
       child: Stack(
         fit: StackFit.loose,
         overflow: Overflow.visible,
-        children: <Widget>[mapa(), inputsLocalizacao()],
+        children: <Widget>[mapa(grupo), inputsLocalizacao()],
       ),
     ));
   }
@@ -192,76 +168,61 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   }
 
   editSelecionarDestino() {
-    return StreamBuilder<GrupoViewModel>(
-      stream: bloc.outGrupo,
-      builder: (context, snapshot) {
-        return TextField(
-          controller: bloc.localDestinoTextController,
-          onTap: () async {
-            Prediction p = await PlacesAutocomplete.show(
-                context: context, apiKey: kGoogleApiKey);
+    return TextFormField(
+      controller: bloc.localDestinoTextController,
+      onTap: () async {
+        Prediction p = await PlacesAutocomplete.show(
+            context: context, apiKey: kGoogleApiKey);
 
-            var _local = await exibirPaginaDePesquisa(p);
-            bloc.setLocalDeDestino(_local);
-            bloc.loadPointsAndMarkers();
-          },
-          onChanged: bloc.filtrarContatos,
-          decoration: InputDecoration(
-              labelText: "Selecionar Destino",
-              hintText: "Selecionar Destino",
-              suffixIcon: Icon(Icons.search)),
-        );
+        var _local = await exibirPaginaDePesquisa(p);
+        bloc.setLocalDeDestino(_local);
+        bloc.loadPointsAndMarkers();
       },
+      onChanged: bloc.filtrarContatos,
+      decoration: InputDecoration(
+          labelText: "Selecionar Destino",
+          hintText: "Selecionar Destino",
+          suffixIcon: Icon(Icons.search)),
     );
   }
 
   editSelecionarPartida() {
-    return StreamBuilder<GrupoViewModel>(
-      stream: bloc.outGrupo,
-      builder: (context, snapshot) {
-        return TextField(
-          controller: bloc.localPartidaTextController,
-          onTap: () async {
-            Prediction p = await PlacesAutocomplete.show(
-                context: context, apiKey: kGoogleApiKey);
+    return TextFormField(
+      controller: bloc.localPartidaTextController,
+      onTap: () async {
+        Prediction p = await PlacesAutocomplete.show(
+            context: context, apiKey: kGoogleApiKey);
 
-            var _local = await exibirPaginaDePesquisa(p);
-            bloc.setLocalDePartida(_local);
-            bloc.loadPointsAndMarkers();
-          },
-          onChanged: bloc.filtrarContatos,
-          decoration: InputDecoration(
-              labelText: "Partida",
-              hintText: "Selecionar Partida",
-              suffixIcon: Icon(Icons.search)),
-        );
+        var _local = await exibirPaginaDePesquisa(p);
+        bloc.setLocalDePartida(_local);
+        bloc.loadPointsAndMarkers();
       },
+      onChanged: bloc.filtrarContatos,
+      decoration: InputDecoration(
+          labelText: "Partida",
+          hintText: "Selecionar Partida",
+          suffixIcon: Icon(Icons.search)),
     );
   }
 
-  mapaInicial() {
-    return StreamBuilder<GrupoViewModel>(
-        stream: bloc.outGrupo,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData)
-            return GoogleMap(
-              mapToolbarEnabled: true,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              initialCameraPosition:
-                  CameraPosition(target: LatLng(1, 1), zoom: 12),
-            );
-
-          return GoogleMap(
+  mapaInicial(GrupoViewModel grupo) {
+    return grupo != null
+        ? GoogleMap(
+            mapToolbarEnabled: true,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+            initialCameraPosition:
+                CameraPosition(target: LatLng(1, 1), zoom: 12),
+          )
+        : GoogleMap(
             mapToolbarEnabled: true,
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
             initialCameraPosition: CameraPosition(
-                target: LatLng(snapshot.data.posicaoInicial.latitude,
-                    snapshot.data.posicaoInicial.longitude),
+                target: LatLng(grupo.posicaoInicial.latitude,
+                    grupo.posicaoInicial.longitude),
                 zoom: 12),
           );
-        });
   }
 
   ListTile listTileContact(Contact contact) {
@@ -276,43 +237,37 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
         leading: avatar);
   }
 
-  mapa() {
+  mapa(GrupoViewModel grupo) {
     return Container(
-      child: StreamBuilder<GrupoViewModel>(
-          stream: bloc.outGrupo,
-          builder: (_, snapshot) {
-            if (!snapshot.hasData || snapshot.data.markers.length == 0)
-              return mapaInicial();
-
-            return GoogleMap(
-              mapToolbarEnabled: true,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              polylines: [
-                Polyline(
-                    width: 5,
-                    color: Theme.of(context).primaryColor,
-                    polylineId:
-                        PolylineId(snapshot.data.markers.first.markerId.value),
-                    points: snapshot.data.polyLinePoints)
-              ].toSet(),
-              initialCameraPosition: CameraPosition(
-                  target: LatLng(snapshot.data.markers.first.position.latitude,
-                      snapshot.data.markers.first.position.longitude),
-                  zoom: 14),
-              markers: snapshot.data.markers,
-            );
-          }),
-    );
+        child: grupo.markers.length == 0
+            ? mapaInicial(grupo)
+            : GoogleMap(
+                mapToolbarEnabled: true,
+                myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                polylines: [
+                  Polyline(
+                      width: 5,
+                      color: Theme.of(context).primaryColor,
+                      polylineId:
+                          PolylineId(grupo.markers.first.markerId.value),
+                      points: grupo.polyLinePoints)
+                ].toSet(),
+                initialCameraPosition: CameraPosition(
+                    target: LatLng(grupo.markers.first.position.latitude,
+                        grupo.markers.first.position.longitude),
+                    zoom: 14),
+                markers: grupo.markers,
+              ));
   }
 
-  paginaDados() {
+  paginaDados(GrupoViewModel grupo) {
     return Container(
         child: Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: <Widget>[
-          TextField(
+          TextFormField(
             controller: bloc.nomeGrupoTextController,
             onChanged: bloc.setNomeGrupo,
             decoration: InputDecoration(labelText: "Nome"),
@@ -323,35 +278,21 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                 child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                StreamBuilder<GrupoViewModel>(
-                    stream: bloc.outGrupo,
-                    builder: (_, snapshot) {
-                      if (!snapshot.hasData)
-                        return Text("Origem não informada");
-                      return Text("Origem: " + snapshot.data.nome);
-                    }),
-                StreamBuilder<GrupoViewModel>(
-                    stream: bloc.outGrupo,
-                    builder: (_, snapshot) {
-                      if (!snapshot.hasData)
-                        return Text("Destino não informado");
-                      return Text("Destino: " + snapshot.data.nome);
-                    }),
+                grupo.localDePartida == null
+                    ? Text("Origem não informada")
+                    : Text("Origem: " + grupo.localDePartida.nome),
+                grupo.localDeDestino == null
+                    ? Text("Destino não informado")
+                    : Text("Destino: " + grupo.localDeDestino.nome)
               ],
             )),
           ),
           Container(
             child: Expanded(
-                child: StreamBuilder<GrupoViewModel>(
-              stream: bloc.outGrupo,
-              initialData: GrupoViewModel(),
-              builder: (_, snapshot) {
-                return ListView(
-                  children: snapshot.data.contatosSelecionados.map((contact) {
-                    return listTileContact(contact);
-                  }).toList(),
-                );
-              },
+                child: ListView(
+              children: grupo.contatosSelecionados.map((contact) {
+                return listTileContact(contact);
+              }).toList(),
             )),
           ),
           Container(

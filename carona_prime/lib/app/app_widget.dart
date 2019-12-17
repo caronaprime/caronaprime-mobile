@@ -1,10 +1,13 @@
+import 'package:carona_prime/app/app_module.dart';
 import 'package:carona_prime/app/pages/grupo/grupo_page.dart';
+import 'package:carona_prime/app/pages/login/login_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:carona_prime/app/pages/home/home_module.dart';
 
 class AppWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final bloc = AppModule.to.bloc<LoginBloc>();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Carona Prime',
@@ -35,7 +38,14 @@ class AppWidget extends StatelessWidget {
             button: TextStyle(fontSize: 18.0),
             body1: TextStyle(color: Colors.black, fontSize: 18)),
       ),
-      home: HomeModule()
+      home: StreamBuilder<bool>(
+          initialData: false,
+          stream: bloc.outLogado,
+          builder: (_, snapshot) {
+            return snapshot.hasData && snapshot.data
+                ? GrupoPage()
+                : HomeModule();
+          }),
     );
   }
 }
