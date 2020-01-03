@@ -242,7 +242,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
 
   mapa(GrupoViewModel grupo) {
     return Container(
-        child: grupo.markers != null || grupo.markers.length == 0
+        child: grupo.markers == null || grupo.markers.length == 0
             ? mapaInicial(grupo)
             : GoogleMap(
                 mapToolbarEnabled: true,
