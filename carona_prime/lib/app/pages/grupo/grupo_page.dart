@@ -10,20 +10,15 @@ class _GrupoPageState extends State<GrupoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(  
+      appBar: AppBar(
         title: Text("Grupos"),
         automaticallyImplyLeading: false,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            RaisedButton(
-                onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => NovoGrupoPage())),
-                child: Text("Novo Grupo")),
-          ],
-        ),
+      body: Center(),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => NovoGrupoPage())),
       ),
     );
   }

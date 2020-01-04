@@ -1,6 +1,5 @@
 import 'package:carona_prime/app/app_module.dart';
 import 'package:carona_prime/app/models/local_model.dart';
-import 'package:carona_prime/app/pages/novo_grupo/grupo_viewmodel.dart';
 import 'package:carona_prime/app/pages/novo_grupo/novo_grupo_bloc.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
@@ -27,19 +26,29 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<GrupoViewModel>(
-        stream: bloc.outGrupo,
-        initialData: GrupoViewModel(),
-        builder: (_, snapshot) {
-          return Scaffold(
-            appBar: AppBar(title: Text(snapshot.data.nome)),
-            body: Container(
+    return Scaffold(
+      appBar: AppBar(
+        title: StreamBuilder<String>(
+            stream: bloc.outNomeGrupo,
+            builder: (_, snapshot) =>
+                Text(snapshot.hasData ? snapshot.data : "Novo Grupo")),
+      ),
+      body: StreamBuilder<int>(
+          stream: bloc.outPageIndex,
+          initialData: 0,
+          builder: (_, snapshot) {
+            return Container(
                 child: <Widget>[
-              pageSelecionarContatos(snapshot.data),
-              pageSelecionarRota(snapshot.data),
-              paginaDados(snapshot.data),
-            ].elementAt(snapshot.data.pageIndex)),
-            bottomNavigationBar: BottomNavigationBar(
+              pageSelecionarContatos(),
+              pageSelecionarRota(),
+              paginaDados(),
+            ].elementAt(snapshot.data));
+          }),
+      bottomNavigationBar: StreamBuilder<int>(
+          stream: bloc.outPageIndex,
+          initialData: 0,
+          builder: (_, snapshot) {
+            return BottomNavigationBar(
               items: <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
                   icon: Icon(Icons.contacts),
@@ -55,62 +64,70 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                 ),
               ],
               onTap: bloc.setIndex,
-              currentIndex: snapshot.data.pageIndex,
-            ),
-          );
-        });
+              currentIndex: snapshot.data,
+            );
+          }),
+    );
   }
 
-  pageSelecionarContatos(GrupoViewModel grupo) {
-    return Container(
-      child: grupo.contatosFiltrados == null
-          ? Center(child: Text("Nenhum contato disponível"))
-          : Container(
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(8),
-                    child: TextField(
-                      controller: bloc.buscarContatosTextController,
-                      onChanged: bloc.filtrarContatos,
-                      decoration: InputDecoration(
-                          labelText: "Buscar",
-                          hintText: "Buscar",
-                          suffixIcon: Icon(Icons.search)),
+  pageSelecionarContatos() {
+    return StreamBuilder<SelecionarContatosViewModel>(
+        stream: bloc.outSelecionarContatosViewModel,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return Container();
+
+          var grupo = snapshot.data;
+          return Container(
+            child: grupo.contatosFiltrados == null
+                ? Center(child: Text("Nenhum contato disponível"))
+                : Container(
+                    child: Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.all(8),
+                          child: TextField(
+                            controller: bloc.buscarContatosTextController,
+                            onChanged: bloc.filtrarContatos,
+                            decoration: InputDecoration(
+                                labelText: "Buscar",
+                                hintText: "Buscar",
+                                suffixIcon: Icon(Icons.search)),
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView(
+                            children: grupo.contatosFiltrados.map((contact) {
+                              var avatar = CircleAvatar(
+                                child: contact.avatar.isEmpty
+                                    ? Text(contact.displayName[0])
+                                    : Image.memory(contact.avatar),
+                              );
+                              return ListTile(
+                                  title: Text(contact.displayName),
+                                  subtitle: Text(contact.phones.first.value),
+                                  trailing: Checkbox(
+                                    value: grupo.contatosSelecionados != null &&
+                                        grupo.contatosSelecionados
+                                                .indexOf(contact) >=
+                                            0,
+                                    onChanged: (value) {
+                                      if (value) {
+                                        bloc.adicionarContatoSelecionado(
+                                            contact);
+                                      } else {
+                                        bloc.removerContatoSelecionado(contact);
+                                      }
+                                    },
+                                  ),
+                                  leading: avatar);
+                            }).toList(),
+                          ),
+                        )
+                      ],
                     ),
                   ),
-                  Expanded(
-                    child: ListView(
-                      children: grupo.contatosFiltrados.map((contact) {
-                        var avatar = CircleAvatar(
-                          child: contact.avatar.isEmpty
-                              ? Text(contact.displayName[0])
-                              : Image.memory(contact.avatar),
-                        );
-                        return ListTile(
-                            title: Text(contact.displayName),
-                            subtitle: Text(contact.phones.first.value),
-                            trailing: Checkbox(
-                              checkColor: Theme.of(context).primaryColor,
-                              value: grupo.contatosSelecionados != null &&
-                                  grupo.contatosSelecionados.indexOf(contact) >=
-                                      0,
-                              onChanged: (value) {
-                                if (value) {
-                                  bloc.adicionarContatoSelecionado(contact);
-                                } else {
-                                  bloc.removerContatoSelecionado(contact);
-                                }
-                              },
-                            ),
-                            leading: avatar);
-                      }).toList(),
-                    ),
-                  )
-                ],
-              ),
-            ),
-    );
+          );
+        });
   }
 
   inputsLocalizacao() {
@@ -141,18 +158,18 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
       padding: EdgeInsets.all(8),
       child: Container(
           decoration: BoxDecoration(
-              borderRadius: borderRadius, color: Theme.of(context).accentColor),
+              borderRadius: borderRadius, color: Theme.of(context).backgroundColor),
           child: child),
     );
   }
 
-  pageSelecionarRota(GrupoViewModel grupo) {
+  pageSelecionarRota() {
     return Container(
         child: Center(
       child: Stack(
         fit: StackFit.loose,
         overflow: Overflow.visible,
-        children: <Widget>[mapa(grupo), inputsLocalizacao()],
+        children: <Widget>[mapa(), inputsLocalizacao()],
       ),
     ));
   }
@@ -208,24 +225,30 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
     );
   }
 
-  mapaInicial(GrupoViewModel grupo) {
-    return grupo != null
-        ? GoogleMap(
-            mapToolbarEnabled: true,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-            initialCameraPosition:
-                CameraPosition(target: LatLng(1, 1), zoom: 12),
-          )
-        : GoogleMap(
+  mapaInicial() {
+    return StreamBuilder<LocalModel>(
+        stream: bloc.outPosicaoInicial,
+        builder: (_, snapshot) {
+          if (!snapshot.hasData)
+            return GoogleMap(
+              mapToolbarEnabled: true,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+              initialCameraPosition:
+                  CameraPosition(target: LatLng(1, 1), zoom: 12),
+            );
+
+          var posicaoInicial = snapshot.data;
+          return GoogleMap(
             mapToolbarEnabled: true,
             myLocationEnabled: true,
             myLocationButtonEnabled: true,
             initialCameraPosition: CameraPosition(
-                target: LatLng(grupo.posicaoInicial.latitude,
-                    grupo.posicaoInicial.longitude),
+                target:
+                    LatLng(posicaoInicial.latitude, posicaoInicial.longitude),
                 zoom: 12),
           );
+        });
   }
 
   ListTile listTileContact(Contact contact) {
@@ -240,31 +263,38 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
         leading: avatar);
   }
 
-  mapa(GrupoViewModel grupo) {
-    return Container(
-        child: grupo.markers == null || grupo.markers.length == 0
-            ? mapaInicial(grupo)
-            : GoogleMap(
-                mapToolbarEnabled: true,
-                myLocationEnabled: true,
-                myLocationButtonEnabled: true,
-                polylines: [
-                  Polyline(
-                      width: 5,
-                      color: Theme.of(context).primaryColor,
-                      polylineId:
-                          PolylineId(grupo.markers.first.markerId.value),
-                      points: grupo.polyLinePoints)
-                ].toSet(),
-                initialCameraPosition: CameraPosition(
-                    target: LatLng(grupo.markers.first.position.latitude,
-                        grupo.markers.first.position.longitude),
-                    zoom: 14),
-                markers: grupo.markers,
-              ));
+  mapa() {
+    return StreamBuilder<MapaViewModel>(
+        stream: bloc.outMapaViewModel,
+        builder: (_, snapshot) {
+          if ((!snapshot.hasData) ||
+              (snapshot.data.markers == null ||
+                  snapshot.data.markers.length == 0)) return mapaInicial();
+
+          var mapaViewModel = snapshot.data;
+          return Container(
+              child: GoogleMap(
+            mapToolbarEnabled: true,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+            polylines: [
+              Polyline(
+                  width: 5,
+                  color: Theme.of(context).primaryColor,
+                  polylineId:
+                      PolylineId(mapaViewModel.markers.first.markerId.value),
+                  points: mapaViewModel.polyLinePoints)
+            ].toSet(),
+            initialCameraPosition: CameraPosition(
+                target: LatLng(mapaViewModel.markers.first.position.latitude,
+                    mapaViewModel.markers.first.position.longitude),
+                zoom: 14),
+            markers: mapaViewModel.markers,
+          ));
+        });
   }
 
-  paginaDados(GrupoViewModel grupo) {
+  paginaDados() {
     return Container(
         child: Padding(
       padding: const EdgeInsets.all(8.0),
@@ -281,22 +311,34 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                 child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                grupo.localDePartida == null
-                    ? Text("Origem não informada")
-                    : Text("Origem: " + grupo.localDePartida.nome),
-                grupo.localDeDestino == null
-                    ? Text("Destino não informado")
-                    : Text("Destino: " + grupo.localDeDestino.nome)
+                StreamBuilder<String>(
+                    stream: bloc.outNomeLocalPartida,
+                    builder: (_, snapshot) => !snapshot.hasData
+                        ? Text("Origem não informada")
+                        : Text("Origem: ${snapshot.data}")),
+                StreamBuilder<String>(
+                    stream: bloc.outNomeLocalDestino,
+                    builder: (_, snapshot) => !snapshot.hasData
+                        ? Text("Destino não informado")
+                        : Text("Destino: ${snapshot.data}")),
               ],
             )),
           ),
           Container(
             child: Expanded(
-                child: ListView(
-              children: grupo.contatosSelecionados.map((contact) {
-                return listTileContact(contact);
-              }).toList(),
-            )),
+                child: StreamBuilder<SelecionarContatosViewModel>(
+                    stream: bloc.outSelecionarContatosViewModel,
+                    builder: (_, snapshot) {
+                      if (!snapshot.hasData) return Container();
+
+                      var contatosSelecionados =
+                          snapshot.data.contatosSelecionados;
+                      return ListView(
+                        children: contatosSelecionados.map((contact) {
+                          return listTileContact(contact);
+                        }).toList(),
+                      );
+                    })),
           ),
           Container(
             child: Row(
