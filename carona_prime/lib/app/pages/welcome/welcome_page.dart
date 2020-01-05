@@ -11,14 +11,17 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Color(0xFF424242),
       bottomNavigationBar: BottomAppBar(
           child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           FlatButton(
-            child: Text('Prosseguir'),
+            child: Text(
+              'Prosseguir',
+              style: TextStyle(color: Colors.white),
+            ),
             onPressed: () {
               Navigator.push(
                 context,

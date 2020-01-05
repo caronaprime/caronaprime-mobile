@@ -1,6 +1,6 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:carona_prime/app/models/local_model.dart';
-import 'package:carona_prime/app/pages/novo_grupo/grupo_viewmodel.dart';
+import 'package:carona_prime/app/pages/grupo/novo_grupo/novo_grupoVM.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -16,12 +16,35 @@ class NovoGrupoBloc extends BlocBase {
   var nomeGrupoTextController = TextEditingController();
   var buscarContatosTextController = TextEditingController();
 
-  var _grupoController = BehaviorSubject<GrupoViewModel>();
-  Observable<GrupoViewModel> get outGrupo => _grupoController.stream;
+  var _nomeGrupoController = BehaviorSubject<String>();
+  Observable<String> get outNomeGrupo => _nomeGrupoController.stream;
+
+  var _selecionarContatosController =
+      BehaviorSubject<SelecionarContatosViewModel>();
+  Observable<SelecionarContatosViewModel> get outSelecionarContatosViewModel =>
+      _selecionarContatosController.stream;
+
+  var _mapaController = BehaviorSubject<MapaViewModel>();
+  Observable<MapaViewModel> get outMapaViewModel => _mapaController.stream;
+
+  var _posicaoInicialController = BehaviorSubject<LocalModel>();
+  Observable<LocalModel> get outPosicaoInicial =>
+      _posicaoInicialController.stream;
+
+  var _nomeLocalPartidaController = BehaviorSubject<String>();
+  Observable<String> get outNomeLocalPartida =>
+      _nomeLocalPartidaController.stream;
+
+  var _nomeLocalDestinoController = BehaviorSubject<String>();
+  Observable<String> get outNomeLocalDestino =>
+      _nomeLocalDestinoController.stream;
+
+  var _pageIndexController = BehaviorSubject<int>();
+  Observable<int> get outPageIndex => _pageIndexController.stream;
 
   void setNomeGrupo(String nome) {
     _grupoViewModel.nome = nome;
-    _grupoController.sink.add(_grupoViewModel);
+    _nomeGrupoController.sink.add(nome);
   }
 
   void cancelar() {
@@ -33,12 +56,12 @@ class NovoGrupoBloc extends BlocBase {
     localPartidaTextController.clear();
     nomeGrupoTextController.clear();
 
-    _grupoController.sink.add(_grupoViewModel);
+    // _grupoController.sink.add(_grupoViewModel);
   }
 
   setIndex(int index) {
     _grupoViewModel.pageIndex = index;
-    _grupoController.sink.add(_grupoViewModel);
+    _pageIndexController.sink.add(index);
   }
 
   Future loadPosicaoInicial() async {
@@ -47,7 +70,7 @@ class NovoGrupoBloc extends BlocBase {
     if (position != null) {
       _grupoViewModel.posicaoInicial =
           LocalModel("", position.latitude, position.longitude, "");
-      _grupoController.sink.add(_grupoViewModel);
+      _posicaoInicialController.sink.add(_grupoViewModel.posicaoInicial);
     }
   }
 
@@ -59,8 +82,10 @@ class NovoGrupoBloc extends BlocBase {
           (contact) =>
               contact.displayName.toUpperCase().contains(query.toUpperCase()));
     }
-
-    _grupoController.sink.add(_grupoViewModel);
+    var contatosViewModel = SelecionarContatosViewModel(
+        contatosSelecionados: _grupoViewModel.contatosSelecionados,
+        contatosFiltrados: _grupoViewModel.contatosFiltrados);
+    _selecionarContatosController.sink.add(contatosViewModel);
   }
 
   void loadContacts(String query) async {
@@ -78,12 +103,18 @@ class NovoGrupoBloc extends BlocBase {
 
   void adicionarContatoSelecionado(Contact contact) {
     _grupoViewModel.contatosSelecionados.add(contact);
-    _grupoController.sink.add(_grupoViewModel);
+    var contatosViewModel = SelecionarContatosViewModel(
+        contatosSelecionados: _grupoViewModel.contatosSelecionados,
+        contatosFiltrados: _grupoViewModel.contatosFiltrados);
+    _selecionarContatosController.sink.add(contatosViewModel);
   }
 
   void removerContatoSelecionado(Contact contact) {
     _grupoViewModel.contatosSelecionados.remove(contact);
-    _grupoController.sink.add(_grupoViewModel);
+    var contatosViewModel = SelecionarContatosViewModel(
+        contatosSelecionados: _grupoViewModel.contatosSelecionados,
+        contatosFiltrados: _grupoViewModel.contatosFiltrados);
+    _selecionarContatosController.sink.add(contatosViewModel);
   }
 
   void setLocalDePartida(LocalModel local) {
@@ -97,7 +128,7 @@ class NovoGrupoBloc extends BlocBase {
           infoWindow: InfoWindow(title: "Local de partida: " + local.nome));
     }
     _grupoViewModel.localDePartida = local;
-    _grupoController.sink.add(_grupoViewModel);
+    _nomeLocalPartidaController.sink.add(local.nome);
   }
 
   void setLocalDeDestino(LocalModel local) {
@@ -111,7 +142,7 @@ class NovoGrupoBloc extends BlocBase {
           infoWindow: InfoWindow(title: "Local de destino: " + local.nome));
     }
     _grupoViewModel.localDeDestino = local;
-    _grupoController.sink.add(_grupoViewModel);
+    _nomeLocalDestinoController.sink.add(local.nome);
   }
 
   LocalModel get localDePartida => _grupoViewModel.localDePartida;
@@ -146,12 +177,20 @@ class NovoGrupoBloc extends BlocBase {
     await loadPoints();
 
     _grupoViewModel.markers = markers.toSet();
-    _grupoController.sink.add(_grupoViewModel);
+    _mapaController.sink.add(MapaViewModel(
+        markers: _grupoViewModel.markers,
+        polyLinePoints: _grupoViewModel.polyLinePoints));
   }
 
   @override
   void dispose() {
-    _grupoController.close();
+    _nomeGrupoController.close();
+    _selecionarContatosController.close();
+    _mapaController.close();
+    _posicaoInicialController.close();
+    _nomeLocalPartidaController.close();
+    _nomeLocalDestinoController.close();
+    _pageIndexController.close();
     super.dispose();
   }
 }

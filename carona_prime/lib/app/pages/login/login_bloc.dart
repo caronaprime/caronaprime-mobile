@@ -1,6 +1,5 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:carona_prime/app/pages/grupo/grupo_page.dart';
-import 'package:carona_prime/app/pages/home/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
@@ -29,7 +28,7 @@ class LoginBloc extends BlocBase {
           verificationId: _verificationId, smsCode: smsCode);
 
       AuthResult authResult = await _auth.signInWithCredential(credential);
-      FirebaseUser user = authResult.user;  
+      FirebaseUser user = authResult.user;
       print('Usuário logado com sucesso $user');
       _logadoBehavior.sink.add(true);
 
@@ -65,7 +64,7 @@ class LoginBloc extends BlocBase {
           _auth.signInWithCredential(phoneAuthCredential);
 
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => HomePage()));
+              MaterialPageRoute(builder: (context) => GrupoPage()));
           print('Auto login realizado: user');
         };
 

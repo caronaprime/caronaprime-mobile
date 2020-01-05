@@ -7,7 +7,7 @@ class LogoCarona extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: CircleAvatar(
-        backgroundColor: Theme.of(context).accentColor,
+        backgroundColor: Colors.white,
         radius: 48.0,
         child: Image.asset('assets/logohd.png'),
       ),
