@@ -1,6 +1,6 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:carona_prime/app/models/local_model.dart';
-import 'package:carona_prime/app/pages/novo_grupo/grupo_viewmodel.dart';
+import 'package:carona_prime/app/pages/grupo/novo_grupo/novo_grupoVM.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -8,20 +8,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:simple_permissions/simple_permissions.dart';
-
-class SelecionarContatosViewModel {
-  List<Contact> contatosSelecionados = List<Contact>();
-  Iterable<Contact> contatosFiltrados = List<Contact>();
-
-  SelecionarContatosViewModel(
-      {this.contatosSelecionados, this.contatosFiltrados});
-}
-
-class MapaViewModel {
-  Set<Marker> markers = Set<Marker>();
-  List<LatLng> polyLinePoints = List<LatLng>();
-  MapaViewModel({this.markers, this.polyLinePoints});
-}
 
 class NovoGrupoBloc extends BlocBase {
   GrupoViewModel _grupoViewModel = GrupoViewModel();

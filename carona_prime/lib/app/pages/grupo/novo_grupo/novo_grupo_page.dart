@@ -1,6 +1,7 @@
 import 'package:carona_prime/app/app_module.dart';
 import 'package:carona_prime/app/models/local_model.dart';
-import 'package:carona_prime/app/pages/novo_grupo/novo_grupo_bloc.dart';
+import 'package:carona_prime/app/pages/grupo/novo_grupo/novo_grupoVM.dart';
+import 'package:carona_prime/app/pages/grupo/novo_grupo/novo_grupo_bloc.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
@@ -158,7 +159,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
       padding: EdgeInsets.all(8),
       child: Container(
           decoration: BoxDecoration(
-              borderRadius: borderRadius, color: Theme.of(context).backgroundColor),
+              borderRadius: borderRadius,
+              color: Theme.of(context).backgroundColor),
           child: child),
     );
   }

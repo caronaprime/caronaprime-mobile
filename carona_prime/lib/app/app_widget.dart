@@ -1,8 +1,5 @@
-import 'package:carona_prime/app/app_module.dart';
-import 'package:carona_prime/app/pages/grupo/grupo_page.dart';
-import 'package:carona_prime/app/pages/login/login_bloc.dart';
-import 'package:flutter/material.dart';
 import 'package:carona_prime/app/pages/home/home_module.dart';
+import 'package:flutter/material.dart';
 
 class AppWidget extends StatelessWidget {
   @override
@@ -13,7 +10,6 @@ class AppWidget extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.deepOrange,
           backgroundColor: Colors.white,
-          
           bottomAppBarTheme: BottomAppBarTheme(color: Color(0xFFe64a19)),
           inputDecorationTheme: InputDecorationTheme(
             contentPadding: EdgeInsets.all(16),

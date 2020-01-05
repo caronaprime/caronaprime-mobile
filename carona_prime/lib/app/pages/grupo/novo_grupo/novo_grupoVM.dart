@@ -16,3 +16,17 @@ class GrupoViewModel {
   Set<Marker> markers = Set<Marker>();
   List<LatLng> polyLinePoints = List<LatLng>();
 }
+
+class SelecionarContatosViewModel {
+  List<Contact> contatosSelecionados = List<Contact>();
+  Iterable<Contact> contatosFiltrados = List<Contact>();
+
+  SelecionarContatosViewModel(
+      {this.contatosSelecionados, this.contatosFiltrados});
+}
+
+class MapaViewModel {
+  Set<Marker> markers = Set<Marker>();
+  List<LatLng> polyLinePoints = List<LatLng>();
+  MapaViewModel({this.markers, this.polyLinePoints});
+}
