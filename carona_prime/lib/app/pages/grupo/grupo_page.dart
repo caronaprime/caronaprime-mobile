@@ -2,6 +2,7 @@ import 'package:carona_prime/app/app_module.dart';
 import 'package:carona_prime/app/models/grupo_model.dart';
 import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_page.dart';
 import 'package:carona_prime/app/pages/grupo/grupo_bloc.dart';
+import 'package:carona_prime/app/pages/notificacoes/notificacoes_page.dart';
 import 'package:carona_prime/app/shared/widgets/default_drawer.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +19,13 @@ class _GrupoPageState extends State<GrupoPage> {
       drawer: DefaultDrawer(),
       appBar: AppBar(
         title: Text("Grupos"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => NotificacoesPage())),
+          )
+        ],
       ),
       body: StreamBuilder<List<GrupoModel>>(
           stream: bloc.outListaGrupos,

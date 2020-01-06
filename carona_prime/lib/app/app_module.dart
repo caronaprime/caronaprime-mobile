@@ -1,3 +1,4 @@
+import 'package:carona_prime/app/pages/notificacoes/notificacoes_bloc.dart';
 import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_bloc.dart';
 import 'package:carona_prime/app/pages/grupo/novo_grupo/novo_grupo_bloc.dart';
 import 'package:carona_prime/app/pages/selecionar_contatos/selecionar_contatos_bloc.dart';
@@ -13,6 +14,7 @@ import 'package:carona_prime/app/app_bloc.dart';
 class AppModule extends ModuleWidget {
   @override
   List<Bloc> get blocs => [
+        Bloc((i) => NotificacoesBloc()),
         Bloc((i) => DetalhesGrupoBloc()),
         Bloc((i) => NovoGrupoBloc()),
         Bloc((i) => SelecionarContatosBloc()),
