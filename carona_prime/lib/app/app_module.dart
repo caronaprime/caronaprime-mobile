@@ -2,7 +2,6 @@ import 'package:carona_prime/app/pages/notificacoes/notificacoes_bloc.dart';
 import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_bloc.dart';
 import 'package:carona_prime/app/pages/grupo/novo_grupo/novo_grupo_bloc.dart';
 import 'package:carona_prime/app/pages/selecionar_contatos/selecionar_contatos_bloc.dart';
-import 'package:carona_prime/app/pages/grupo/grupo_bloc.dart';
 import 'package:carona_prime/app/pages/login/login_bloc.dart';
 import 'package:carona_prime/app/pages/login_mode/login_mode_bloc.dart';
 import 'package:carona_prime/app/pages/welcome/welcome_bloc.dart';
@@ -17,8 +16,7 @@ class AppModule extends ModuleWidget {
         Bloc((i) => NotificacoesBloc()),
         Bloc((i) => DetalhesGrupoBloc()),
         Bloc((i) => NovoGrupoBloc()),
-        Bloc((i) => SelecionarContatosBloc()),
-        Bloc((i) => GrupoBloc()),
+        Bloc((i) => SelecionarContatosBloc()),        
         Bloc((i) => SelecionarContatosBloc()),
         Bloc((i) => LoginModeBloc()),
         Bloc((i) => LoginBloc()),
