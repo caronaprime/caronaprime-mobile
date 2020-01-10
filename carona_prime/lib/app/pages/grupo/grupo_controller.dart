@@ -6,13 +6,13 @@ part 'grupo_controller.g.dart';
 
 class GrupoController = GrupoBase with _$GrupoController;
 
-abstract class GrupoBase with Store {  
+abstract class GrupoBase with Store {
   @observable
   ObservableList<GrupoModel> grupos = ObservableList<GrupoModel>();
-
+  
   @action
   void novoGrupoFake() {
     grupos.add(GrupoModel("nome do grupo", LocalModel("Origem", 0, 0, ""),
-        LocalModel("Destino", 0, 0, ""), Duration(hours: 12)));    
+        LocalModel("Destino", 0, 0, ""), Duration(hours: 12)));
   }
 }
