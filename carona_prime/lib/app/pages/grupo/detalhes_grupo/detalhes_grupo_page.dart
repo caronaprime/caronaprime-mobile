@@ -1,68 +1,49 @@
-import 'package:carona_prime/app/app_module.dart';
 import 'package:carona_prime/app/models/usuario_model.dart';
-import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_bloc.dart';
+import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 
-class DetalhesGrupoPage extends StatefulWidget {
-  final String title;
-  const DetalhesGrupoPage({Key key, this.title = "DetalhesGrupo"})
-      : super(key: key);
+class DetalhesGrupoPage extends StatelessWidget {
+  final controller = DetalhesGrupoController();
 
-  @override
-  _DetalhesGrupoPageState createState() => _DetalhesGrupoPageState();
-}
+  final vagasDisponiveis = [1, 2, 3, 4, 5, 6];
 
-class _DetalhesGrupoPageState extends State<DetalhesGrupoPage> {
-  var vagasDisponiveis = [1, 2, 3, 4, 5, 6];
-  List<UsuarioModel> membros = [
-    UsuarioModel("Riquelminho Gaucho", "999423412349"),
-    UsuarioModel("Cristiano Messi", "6599942002"),
-    UsuarioModel("Lionel Ronaldo", "6623450403"),
-  ];
-  final bloc = AppModule.to.bloc<DetalhesGrupoBloc>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Nome do Grupo")),
-      body: StreamBuilder<int>(
-          stream: bloc.outPageIndex,
-          initialData: 0,
-          builder: (_, snapshot) {
-            return Container(
-                child: <Widget>[
-              pageCaronasDisponiveis(),
-              pageOferecerCarona(),
-              pageMembros()
-            ].elementAt(snapshot.data));
-          }),
-      bottomNavigationBar: StreamBuilder<int>(
-          stream: bloc.outPageIndex,
-          initialData: 0,
-          builder: (_, snapshot) {
-            return BottomNavigationBar(
-              items: <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.departure_board),
-                  title: Text('Caronas Disponíveis'),
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.directions_car),
-                  title: Text('Oferecer Carona'),
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.group),
-                  title: Text('Membros'),
-                ),
-              ],
-              onTap: bloc.setIndex,
-              currentIndex: snapshot.data,
-            );
-          }),
+      body: Observer(
+          builder: (_) => Container(
+                  child: <Widget>[
+                pageCaronasDisponiveis(context),
+                pageOferecerCarona(context),
+                pageMembros(controller.membros)
+              ].elementAt(controller.pageIndex))),
+      bottomNavigationBar: Observer(
+        builder: (_) => BottomNavigationBar(
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.departure_board),
+              title: Text('Caronas Disponíveis'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.directions_car),
+              title: Text('Oferecer Carona'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.group),
+              title: Text('Membros'),
+            ),
+          ],
+          onTap: controller.setPageIndex,
+          currentIndex: controller.pageIndex,
+        ),
+      ),
     );
   }
 
-  pageCaronasDisponiveis() {
+  pageCaronasDisponiveis(BuildContext context) {
     return Column(
       children: <Widget>[
         Container(
@@ -132,7 +113,7 @@ class _DetalhesGrupoPageState extends State<DetalhesGrupoPage> {
     );
   }
 
-  pageOferecerCarona() {
+  pageOferecerCarona(BuildContext context) {
     return Column(
       children: <Widget>[
         Container(
@@ -149,11 +130,11 @@ class _DetalhesGrupoPageState extends State<DetalhesGrupoPage> {
                   child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  opcaoAdicionalButton("Carro Adaptado",
+                  opcaoAdicionalButton("Carro Adaptado", context,
                       checked: true,
                       iconData: Icons.accessible,
                       onTap: () => print("Implementar")),
-                  opcaoAdicionalButton("Porta-malas livre",
+                  opcaoAdicionalButton("Porta-malas livre", context,
                       checked: false,
                       iconData: Icons.shopping_cart,
                       onTap: () => print("Implementar"))
@@ -212,7 +193,7 @@ class _DetalhesGrupoPageState extends State<DetalhesGrupoPage> {
     );
   }
 
-  pageMembros() {
+  pageMembros(ObservableList<UsuarioModel> membros) {
     if (membros == null || membros.isEmpty)
       return Center(
         child: Container(
@@ -298,7 +279,7 @@ class _DetalhesGrupoPageState extends State<DetalhesGrupoPage> {
         });
   }
 
-  opcaoAdicionalButton(String label,
+  opcaoAdicionalButton(String label, BuildContext context,
       {bool checked = false, IconData iconData, Function() onTap}) {
     return GestureDetector(
       onTap: onTap,

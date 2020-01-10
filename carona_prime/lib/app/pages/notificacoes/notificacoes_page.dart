@@ -1,36 +1,24 @@
+import 'package:carona_prime/app/pages/notificacoes/notificacoes_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
-class NotificacoesPage extends StatefulWidget {
-  final String title;
-  const NotificacoesPage({Key key, this.title = "Notificações"})
-      : super(key: key);
+class NotificacoesPage extends StatelessWidget {
+  final controller = NotificacoesController();
 
-  @override
-  _NotificacoesPageState createState() => _NotificacoesPageState();
-}
-
-class _NotificacoesPageState extends State<NotificacoesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: ListView(
-        children: <Widget>[
-          conviteWidget(
-              "Patrícia esta te convidando para participar do grupo X",
-              "origem: - destino:"),
-          conviteWidget("José te adicionou como administrador do grupo Y",
-              "origem: - destino:"),
-          conviteWidget("Maria quer participar do grupo Z", ""),
-          conviteWidget("Maria quer participar do grupo O", "")
-        ],
-      ),
-    );
+        appBar: AppBar(
+          title: Text("Notificações"),
+        ),
+        body: Observer(
+            builder: (_) => ListView(
+                children: controller.notificacoes
+                    .map((n) => conviteWidget(context, n.titulo, n.descricao))
+                    .toList())));
   }
 
-  conviteWidget(String titulo, String descricao) {
+  Widget conviteWidget(BuildContext context, String titulo, String descricao) {
     return Container(
       height: 200,
       child: Card(

@@ -1,56 +1,37 @@
-import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:carona_prime/app/pages/grupo/grupo_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:mobx/mobx.dart';
+part 'login_controller.g.dart';
 
-class LoginBloc extends BlocBase {
+class LoginController = LoginBase with _$LoginController;
+
+abstract class LoginBase with Store {
   var _auth = FirebaseAuth.instance;
   String _verificationId;
   var phoneTextController = TextEditingController();
   var codeTextController = TextEditingController();
 
-  var _logadoBehavior = BehaviorSubject<bool>();
-  Stream<bool> get outLogado => _logadoBehavior.stream;
 
-  var _phoneNumberBehavior = BehaviorSubject<String>();
-  Stream<String> get outPhoneNumber => _phoneNumberBehavior.stream;
+  @observable
+  bool logado = false;
 
-  var _codeNumberBehavior = BehaviorSubject<String>();
-  Stream<String> get outCodeNumber => _codeNumberBehavior.stream;
+  @observable
+  String phoneNumber = "";
 
-  var _statusBehavior = BehaviorSubject<String>();
-  Stream<String> get outStatus => _statusBehavior.stream;
+  @observable
+  String codeNumber = "";
 
-  Future<void> entrar(BuildContext context, String smsCode) async {
-    try {
-      AuthCredential credential = PhoneAuthProvider.getCredential(
-          verificationId: _verificationId, smsCode: smsCode);
+  @observable
+  String status = "";
 
-      AuthResult authResult = await _auth.signInWithCredential(credential);
-      FirebaseUser user = authResult.user;
-      print('Usuário logado com sucesso $user');
-      _logadoBehavior.sink.add(true);
+  @action
+  void setLogado(bool value) => logado = value;
 
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => GrupoPage()));
-    } catch (e) {
-      print("verificaPhone ERROR: ${e.toString()}");
-    }
-  }
+  @action
+  void setPhoneNumber(String value) => phoneNumber = value;
 
-  @override
-  void dispose() {
-    _phoneNumberBehavior.close();
-    _codeNumberBehavior.close();
-    _statusBehavior.close();
-    _logadoBehavior.close();
-    super.dispose();
-  }
-
-  setPhoneNumber(String value) => _phoneNumberBehavior.add(value);
-  setCode(String value) => _codeNumberBehavior.add(value);
-
+  @action
   enviarCodigo(BuildContext context) async {
     try {
       final phoneNumber = "+55" +
@@ -99,6 +80,7 @@ class LoginBloc extends BlocBase {
     }
   }
 
+  @action
   void mostrarDialogoCodigo(BuildContext context) {
     showDialog(
         context: context,
@@ -121,4 +103,21 @@ class LoginBloc extends BlocBase {
           );
         });
   }
+  Future<void> entrar(BuildContext context, String smsCode) async {
+    try {
+      AuthCredential credential = PhoneAuthProvider.getCredential(
+          verificationId: _verificationId, smsCode: smsCode);
+
+      AuthResult authResult = await _auth.signInWithCredential(credential);
+      FirebaseUser user = authResult.user;
+      print('Usuário logado com sucesso $user');
+      setLogado(true);
+
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => GrupoPage()));
+    } catch (e) {
+      print("verificaPhone ERROR: ${e.toString()}");
+    }
+  }
+
 }
