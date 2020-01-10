@@ -7,7 +7,7 @@ import 'package:carona_prime/app/pages/notificacoes/notificacoes_page.dart';
 main() {
   testWidgets('NotificacoesPage has title', (WidgetTester tester) async {
     await tester.pumpWidget(
-        buildTestableWidget(NotificacoesPage(title: 'Notificacoes')));
+        buildTestableWidget(NotificacoesPageOld(title: 'Notificacoes')));
     final titleFinder = find.text('Notificacoes');
     expect(titleFinder, findsOneWidget);
   });

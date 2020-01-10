@@ -6,15 +6,15 @@ import 'package:carona_prime/app/app_module.dart';
 
 void main() {
   initModule(AppModule());
-  NotificacoesBloc bloc;
+  NotificacoesBlocOld bloc;
 
   setUp(() {
-    bloc = AppModule.to.bloc<NotificacoesBloc>();
+    bloc = AppModule.to.bloc<NotificacoesBlocOld>();
   });
 
   group('NotificacoesBloc Test', () {
     test("First Test", () {
-      expect(bloc, isInstanceOf<NotificacoesBloc>());
+      expect(bloc, isInstanceOf<NotificacoesBlocOld>());
     });
   });
 }
