@@ -1,16 +1,12 @@
-import 'package:carona_prime/app/app_module.dart';
+import 'package:carona_prime/app/pages/login/login_controller.dart';
 import 'package:carona_prime/app/shared/widgets/logo_carona.dart';
 import 'package:flutter/material.dart';
-import 'login_bloc.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
+  final controller = LoginController();
+
   @override
-  _LoginPageState createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  var _bloc = AppModule.to.getBloc<LoginBloc>();
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Carona Prime')),
@@ -26,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
           Expanded(child: Center(child: Text("Informe seu número de celular"))),
           Expanded(child: SizedBox()),
           phoneTextField(),
-          enviarCodigoButton(),
+          enviarCodigoButton(context),
           labelInformativo(),
           Expanded(child: SizedBox())
         ],
@@ -35,16 +31,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   code() {
-    return StreamBuilder(
-      stream: _bloc.outStatus,
-      initialData: "",
-      builder: (context, snapshot) {
-        return Container(
-          child: snapshot.hasData
-              ? Text(snapshot.data)
-              : CircularProgressIndicator(),
-        );
-      },
+    return Observer(
+      builder: (_) => Container(
+        child: Text("rever"),
+          // child: snapshot.hasData
+          //     ? Text(snapshot.data)
+          //     : CircularProgressIndicator(),
+        )
     );
   }
 
@@ -56,14 +49,14 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  enviarCodigoButton() {
+  enviarCodigoButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: RaisedButton(
           child: Text("Enviar Código"),
           onPressed: () {
-            _bloc.enviarCodigo(context);
-            _bloc.mostrarDialogoCodigo(context);
+            controller.enviarCodigo(context);
+            controller.mostrarDialogoCodigo(context);            
           }),
     );
   }
@@ -72,8 +65,8 @@ class _LoginPageState extends State<LoginPage> {
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: TextFormField(
-        onChanged: (value) => _bloc.setPhoneNumber(value),
-        controller: _bloc.phoneTextController,
+        onChanged: (value) => controller.setPhoneNumber(value),
+        controller: controller.phoneTextController,
         keyboardType: TextInputType.phone,
         autofocus: false,
         decoration: InputDecoration(
