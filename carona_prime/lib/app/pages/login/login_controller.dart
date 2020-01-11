@@ -1,17 +1,18 @@
-import 'package:carona_prime/app/pages/grupo/lista_grupo/lista_grupo_page.dart';
+import 'package:carona_prime/app/application_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mobx/mobx.dart';
 part 'login_controller.g.dart';
 
 class LoginController = LoginBase with _$LoginController;
 
 abstract class LoginBase with Store {
+  var applicationController = GetIt.I.get<ApplicationController>();
   var _auth = FirebaseAuth.instance;
   String _verificationId;
   var phoneTextController = TextEditingController();
   var codeTextController = TextEditingController();
-
 
   @observable
   bool logado = false;
@@ -24,9 +25,6 @@ abstract class LoginBase with Store {
 
   @observable
   String status = "";
-
-  @action
-  void setLogado(bool value) => logado = value;
 
   @action
   void setPhoneNumber(String value) => phoneNumber = value;
@@ -44,8 +42,7 @@ abstract class LoginBase with Store {
             (AuthCredential phoneAuthCredential) {
           _auth.signInWithCredential(phoneAuthCredential);
 
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => ListaGrupoPage()));
+          applicationController.logar();
           print('Auto login realizado: user');
         };
 
@@ -103,6 +100,7 @@ abstract class LoginBase with Store {
           );
         });
   }
+
   Future<void> entrar(BuildContext context, String smsCode) async {
     try {
       AuthCredential credential = PhoneAuthProvider.getCredential(
@@ -111,13 +109,12 @@ abstract class LoginBase with Store {
       AuthResult authResult = await _auth.signInWithCredential(credential);
       FirebaseUser user = authResult.user;
       print('Usuário logado com sucesso $user');
-      setLogado(true);
-
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => ListaGrupoPage()));
+      applicationController.logar();
+      while (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
     } catch (e) {
       print("verificaPhone ERROR: ${e.toString()}");
     }
   }
-
 }
