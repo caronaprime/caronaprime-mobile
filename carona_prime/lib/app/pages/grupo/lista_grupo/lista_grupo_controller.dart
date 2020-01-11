@@ -2,15 +2,15 @@ import 'package:carona_prime/app/models/grupo_model.dart';
 import 'package:carona_prime/app/models/local_model.dart';
 import 'package:mobx/mobx.dart';
 
-part 'grupo_controller.g.dart';
+part 'lista_grupo_controller.g.dart';
 
-class GrupoController = GrupoBase with _$GrupoController;
+class ListaGrupoController = ListaGrupoBase with _$ListaGrupoController;
 
-abstract class GrupoBase with Store {
+abstract class ListaGrupoBase with Store {
   @observable
   ObservableList<GrupoModel> grupos = ObservableList<GrupoModel>();
   
-  @action
+  @action 
   void novoGrupoFake() {
     grupos.add(GrupoModel("nome do grupo", LocalModel("Origem", 0, 0, ""),
         LocalModel("Destino", 0, 0, ""), Duration(hours: 12)));

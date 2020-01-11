@@ -1,14 +1,13 @@
-import 'package:carona_prime/app/pages/grupo/grupo_controller.dart';
+import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_page.dart';
+import 'package:carona_prime/app/pages/grupo/lista_grupo/lista_grupo_controller.dart';
+import 'package:carona_prime/app/pages/grupo/novo_grupo/novo_grupo_page.dart';
 import 'package:carona_prime/app/pages/notificacoes/notificacoes_page.dart';
 import 'package:carona_prime/app/shared/widgets/default_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
-import 'detalhes_grupo/detalhes_grupo_page.dart';
-import 'novo_grupo/novo_grupo_page.dart';
-
-class GrupoPage extends StatelessWidget {
-  final controller = GrupoController();
+class ListaGrupoPage extends StatelessWidget {
+  final controller = ListaGrupoController();
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,4 @@
-import 'package:carona_prime/app/pages/home/home_module.dart';
+import 'package:carona_prime/app/pages/welcome/welcome_page.dart';
 import 'package:flutter/material.dart';
 
 class AppWidget extends StatelessWidget {
@@ -30,6 +30,6 @@ class AppWidget extends StatelessWidget {
               button: TextStyle(fontSize: 14),
               body1: TextStyle(color: Colors.black, fontSize: 14)),
         ),
-        home: HomeModule());
+        home: WelcomePage());
   }
 }

@@ -1,4 +1,4 @@
-import 'package:carona_prime/app/pages/grupo/grupo_page.dart';
+import 'package:carona_prime/app/pages/grupo/lista_grupo/lista_grupo_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
@@ -45,7 +45,7 @@ abstract class LoginBase with Store {
           _auth.signInWithCredential(phoneAuthCredential);
 
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => GrupoPage()));
+              MaterialPageRoute(builder: (context) => ListaGrupoPage()));
           print('Auto login realizado: user');
         };
 
@@ -114,7 +114,7 @@ abstract class LoginBase with Store {
       setLogado(true);
 
       Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => GrupoPage()));
+          .push(MaterialPageRoute(builder: (context) => ListaGrupoPage()));
     } catch (e) {
       print("verificaPhone ERROR: ${e.toString()}");
     }
