@@ -13,5 +13,4 @@ abstract class NotificacoesBase with Store {
     NotificacaoModel("Maria quer participar do grupo B", "Origem: Z - Destino: Q")
 
   ].asObservable();
-
 }

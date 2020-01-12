@@ -1,11 +1,12 @@
+import 'package:carona_prime/app/application_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get_it/get_it.dart';
 
 class DefaultDrawer extends StatelessWidget {
-  const DefaultDrawer({Key key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
+    var applicationController = GetIt.I.get<ApplicationController>();
     return Drawer(
       child: ListView(
         children: <Widget>[
@@ -25,7 +26,10 @@ class DefaultDrawer extends StatelessWidget {
               title: Text("Mapa"),
               subtitle: Text("Configurações de mapas")),
           ListTile(
-              leading: Icon(FontAwesomeIcons.doorOpen), title: Text("Sair")),
+            leading: Icon(FontAwesomeIcons.doorOpen),
+            title: Text("Sair"),
+            onTap: applicationController.deslogar,
+          ),
         ],
       ),
     );

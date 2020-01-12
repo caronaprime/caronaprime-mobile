@@ -6,6 +6,9 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 class LoginPage extends StatelessWidget {
   final controller = LoginController();
 
+  final phoneTextController = TextEditingController();
+  final codeTextController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,13 +35,12 @@ class LoginPage extends StatelessWidget {
 
   code() {
     return Observer(
-      builder: (_) => Container(
-        child: Text("rever"),
-          // child: snapshot.hasData
-          //     ? Text(snapshot.data)
-          //     : CircularProgressIndicator(),
-        )
-    );
+        builder: (_) => Container(
+              child: Text("rever"),
+              // child: snapshot.hasData
+              //     ? Text(snapshot.data)
+              //     : CircularProgressIndicator(),
+            ));
   }
 
   FlatButton labelInformativo() {
@@ -55,23 +57,61 @@ class LoginPage extends StatelessWidget {
       child: RaisedButton(
           child: Text("Enviar Código"),
           onPressed: () {
-            controller.enviarCodigo(context);
-            controller.mostrarDialogoCodigo(context);            
+            controller.enviarCodigo(phoneTextController.text);
+            mostrarDialogoCodigo(context);
           }),
     );
+  }
+
+  void mostrarDialogoCodigo(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text("Informe o código recebido"),
+            content: Observer(
+              builder: (_) => TextFormField(
+                controller: codeTextController,
+                decoration: InputDecoration(errorText: controller.error),
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                  textTheme: ButtonTextTheme.primary,
+                  child: Text("Fechar"),
+                  onPressed: () => Navigator.of(context).pop()),
+              FlatButton(
+                  textTheme: ButtonTextTheme.primary,
+                  child: Text("Entrar"),
+                  onPressed: () async {
+                    var entrou =
+                        await controller.entrar(codeTextController.text);
+
+                    if (entrou) {
+                      while (Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      }
+                    }
+                  }),
+            ],
+          );
+        });
   }
 
   phoneTextField() {
     return Padding(
       padding: EdgeInsets.all(8.0),
-      child: TextFormField(
-        onChanged: (value) => controller.setPhoneNumber(value),
-        controller: controller.phoneTextController,
-        keyboardType: TextInputType.phone,
-        autofocus: false,
-        decoration: InputDecoration(
-          labelText: "Celular",
-          hintText: 'Ex: (99) 9 9999 9999 ',
+      child: Observer(
+        builder: (_) => TextFormField(
+          onChanged: (value) => controller.setPhoneNumber(value),
+          controller: phoneTextController,
+          keyboardType: TextInputType.phone,
+          autofocus: false,
+          decoration: InputDecoration(
+            errorText: controller.error,
+            labelText: "Celular",
+            hintText: 'Ex: (99) 9 9999 9999 ',
+          ),
         ),
       ),
     );
