@@ -78,7 +78,7 @@ class TermosUsoPage extends StatelessWidget {
               FluTube(
                 'https://www.youtube.com/watch?v=lkF0TQJO0bA&list=PLOU2XLYxmsIL0pH0zWe_ZOHgGhZ7UasUE',
                 aspectRatio: 16 / 9,
-                autoPlay: true,
+                autoPlay: false,
                 looping: false,
                 onVideoStart: () {},
                 onVideoEnd: () {},

@@ -1,4 +1,5 @@
 import 'package:carona_prime/app/application_controller.dart';
+import 'package:carona_prime/app/pages/perguntas_frequentes/perguntas_frequentes_page.dart';
 import 'package:carona_prime/app/pages/politica_privacidade/politica_privacidade_page.dart';
 import 'package:carona_prime/app/pages/termos_uso/termos_uso_page.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,12 @@ class DefaultDrawer extends StatelessWidget {
             title: Text("Política de Privacidade"),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => PoliticaPrivacidadePage(null, null))),
+          ),
+          ListTile(
+            leading: Icon(Icons.help),
+            title: Text("Perguntas Frequentes"),
+            onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => PerguntasFrequentesPage())),
           ),
           ListTile(
             leading: Icon(Icons.exit_to_app),
