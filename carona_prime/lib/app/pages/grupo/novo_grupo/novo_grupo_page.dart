@@ -13,13 +13,19 @@ class NovoGrupoPage extends StatefulWidget {
 }
 
 class _NovoGrupoPageState extends State<NovoGrupoPage> {
+  final localPartidaTextController = TextEditingController();
+  final localDestinoTextController = TextEditingController();
+  final nomeGrupoTextController = TextEditingController();
+  final buscarContatosTextController = TextEditingController();
+
   static String kGoogleApiKey = "AIzaSyDny8aAA0AA9LBWNAkNONtTwVLFJz7u6Fo";
   GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
   var controller = NovoGrupoController();
+  var pageController = PageController();
 
   @override
   void initState() {
-    controller.loadContacts("");
+    controller.loadContacts();
     controller.loadPosicaoInicial();
     super.initState();
   }
@@ -34,12 +40,15 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                   : controller.nomeGrupo)),
         ),
         body: Observer(
-          builder: (_) => Container(
-              child: <Widget>[
-            pageSelecionarContatos(),
-            pageSelecionarRota(),
-            paginaDados(),
-          ].elementAt(controller.pageIndex)),
+          builder: (_) => PageView(
+              physics: NeverScrollableScrollPhysics(),
+              controller: pageController,
+              pageSnapping: true,
+              children: <Widget>[
+                pageSelecionarContatos(),
+                pageSelecionarRota(),
+                pageDados(),
+              ]),
         ),
         bottomNavigationBar: Observer(
           builder: (_) => BottomNavigationBar(
@@ -50,26 +59,30 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.map),
-                  title: Text('Rotas'),
+                  title: Text('Rota'),
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.create),
                   title: Text('Dados'),
                 ),
               ],
-              onTap: controller.setPageIndex,
-              currentIndex: controller.pageIndex),
+              currentIndex: controller.pageIndex.toInt(),
+              onTap: (index) {
+                pageController.jumpTo(index.toDouble());
+                pageController.animateToPage(index,
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.bounceIn);
+                controller.setPageIndex(index);
+              }),
         ));
   }
 
-  pageSelecionarContatos() {
+  Widget pageSelecionarContatos() {
     return Observer(
       builder: (_) {
-        if (controller.selecionarContatosViewModel == null) return Container();
-
-        var selecionarContatos = controller.selecionarContatosViewModel;
         return Container(
-          child: selecionarContatos.contatosFiltrados == null
+          child: controller.todosContatos == null ||
+                  controller.todosContatos.isEmpty
               ? Center(child: Text("Nenhum contato disponível"))
               : Container(
                   child: Column(
@@ -77,8 +90,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                       Padding(
                         padding: EdgeInsets.all(8),
                         child: TextField(
-                          controller: controller.buscarContatosTextController,
-                          onChanged: controller.filtrarContatos,
+                          controller: buscarContatosTextController,
+                          onChanged: controller.setQuery,
                           decoration: InputDecoration(
                               labelText: "Buscar",
                               hintText: "Buscar",
@@ -87,8 +100,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                       ),
                       Expanded(
                         child: ListView(
-                          children: selecionarContatos.contatosFiltrados
-                              .map((contact) {
+                          children: controller.contatosFiltrados.map((contact) {
                             var avatar = CircleAvatar(
                               child: contact.avatar.isEmpty
                                   ? Text(contact.displayName[0])
@@ -98,12 +110,11 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                                 title: Text(contact.displayName),
                                 subtitle: Text(contact.phones.first.value),
                                 trailing: Checkbox(
-                                  value: selecionarContatos
-                                              .contatosSelecionados !=
-                                          null &&
-                                      selecionarContatos.contatosSelecionados
-                                              .indexOf(contact) >=
-                                          0,
+                                  value:
+                                      controller.contatosSelecionados != null &&
+                                          controller.contatosSelecionados
+                                                  .indexOf(contact) >=
+                                              0,
                                   onChanged: (value) {
                                     if (value) {
                                       controller
@@ -160,7 +171,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
     );
   }
 
-  pageSelecionarRota() {
+  Widget pageSelecionarRota() {
+    print("pageSelecionarRota");
     return Container(
         child: Center(
       child: Stack(
@@ -184,7 +196,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
 
   editSelecionarDestino() {
     return TextField(
-      controller: controller.localDestinoTextController,
+      controller: localDestinoTextController,
       onTap: () async {
         Prediction p = await PlacesAutocomplete.show(
             context: context, apiKey: kGoogleApiKey);
@@ -193,6 +205,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
         if (_local != null) {
           controller.setLocalDeDestino(_local);
           controller.loadPointsAndMarkers();
+          localDestinoTextController.text = _local.nome;
         }
       },
       decoration: InputDecoration(
@@ -204,7 +217,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
 
   editSelecionarPartida() {
     return TextField(
-      controller: controller.localPartidaTextController,
+      controller: localPartidaTextController,
       onTap: () async {
         Prediction p = await PlacesAutocomplete.show(
             context: context, apiKey: kGoogleApiKey);
@@ -213,6 +226,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
         if (_local != null) {
           controller.setLocalDePartida(_local);
           controller.loadPointsAndMarkers();
+          localPartidaTextController.text = _local.nome;
         }
       },
       decoration: InputDecoration(
@@ -262,10 +276,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   mapa() {
     return Observer(
       builder: (_) {
-        var mapaViewModel = controller.mapaViewModel;
-        if ((mapaViewModel == null) ||
-            (mapaViewModel.markers == null ||
-                mapaViewModel.markers.length == 0)) return mapaInicial();
+        if (controller.markers == null || controller.markers.length == 0)
+          return mapaInicial();
 
         return Container(
             child: GoogleMap(
@@ -276,28 +288,28 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
             Polyline(
                 width: 5,
                 color: Theme.of(context).primaryColor,
-                polylineId:
-                    PolylineId(mapaViewModel.markers.first.markerId.value),
-                points: mapaViewModel.polyLinePoints)
+                polylineId: PolylineId(controller.markers.first.markerId.value),
+                points: controller.polyLinePoints)
           ].toSet(),
           initialCameraPosition: CameraPosition(
-              target: LatLng(mapaViewModel.markers.first.position.latitude,
-                  mapaViewModel.markers.first.position.longitude),
+              target: LatLng(controller.markers.first.position.latitude,
+                  controller.markers.first.position.longitude),
               zoom: 14),
-          markers: mapaViewModel.markers,
+          markers: controller.markers.toSet(),
         ));
       },
     );
   }
 
-  paginaDados() {
+  Widget pageDados() {
+    print("pageDados");
     return Container(
         child: Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: <Widget>[
           TextField(
-            controller: controller.nomeGrupoTextController,
+            controller: nomeGrupoTextController,
             onChanged: controller.setNomeGrupo,
             decoration: InputDecoration(labelText: "Nome"),
           ),
@@ -324,11 +336,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
             child: Expanded(
               child: Observer(
                 builder: (_) {
-                  if (controller.selecionarContatosViewModel == null)
-                    return Container();
-
-                  var contatosSelecionados = controller
-                      .selecionarContatosViewModel.contatosSelecionados;
+                  var contatosSelecionados = controller.contatosSelecionados;
                   return ListView(
                     children: contatosSelecionados.map((contact) {
                       return listTileContact(contact);
