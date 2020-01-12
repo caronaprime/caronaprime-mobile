@@ -71,7 +71,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                 pageController.jumpTo(index.toDouble());
                 pageController.animateToPage(index,
                     duration: Duration(milliseconds: 500),
-                    curve: Curves.bounceIn);
+                    curve: Curves.decelerate);
                 controller.setPageIndex(index);
               }),
         ));

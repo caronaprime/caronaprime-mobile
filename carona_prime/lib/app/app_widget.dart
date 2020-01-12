@@ -1,5 +1,5 @@
 import 'package:carona_prime/app/pages/grupo/lista_grupo/lista_grupo_page.dart';
-import 'package:carona_prime/app/pages/welcome/welcome_page.dart';
+import 'package:carona_prime/app/pages/inicio/inicio_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
@@ -35,13 +35,15 @@ class AppWidget extends StatelessWidget {
           ),
           textTheme: TextTheme(
               button: TextStyle(fontSize: 14),
-              body1: TextStyle(color: Colors.black, fontSize: 14)),
+              body1: TextStyle(color: Colors.black, fontSize: 14),
+              body2: TextStyle(
+                  color: Colors.black54, fontSize: 20, wordSpacing: 2)),
         ),
         home: Observer(
           builder: (_) {
             if (applicationController.logado) return ListaGrupoPage();
 
-            return WelcomePage();
+            return InicioPage();
           },
         ));
   }

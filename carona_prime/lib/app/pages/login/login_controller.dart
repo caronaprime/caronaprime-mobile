@@ -1,5 +1,5 @@
 import 'package:carona_prime/app/application_controller.dart';
-import 'package:carona_prime/app/repositories/login_repository.dart';
+import 'package:carona_prime/app/shared/repositories/login_repository.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mobx/mobx.dart';
 part 'login_controller.g.dart';

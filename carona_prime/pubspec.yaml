@@ -16,8 +16,7 @@ version: 1.0.0+1
 environment:
   sdk: ">=2.1.0 <3.0.0"
 
-dependencies:
-  font_awesome_flutter: ^8.5.0  
+dependencies:  
   dio: ^3.0.3
   firebase_core: ^0.4.0+9
   firebase_auth: ^0.14.0+5     
@@ -34,6 +33,7 @@ dependencies:
   build_runner: ^1.7.3
   flutter_mobx: ^0.3.6
   get_it: ^3.1.0
+  flutube: ^0.8.3
   flutter:
     sdk: flutter
 
