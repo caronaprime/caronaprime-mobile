@@ -171,17 +171,14 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
     );
   }
 
-  Widget pageSelecionarRota() {
-    print("pageSelecionarRota");
-    return Container(
-        child: Center(
-      child: Stack(
-        fit: StackFit.loose,
-        overflow: Overflow.visible,
-        children: <Widget>[mapa(), inputsLocalizacao()],
-      ),
-    ));
-  }
+  Widget pageSelecionarRota() => Container(
+          child: Center(
+        child: Stack(
+          fit: StackFit.loose,
+          overflow: Overflow.visible,
+          children: <Widget>[mapa(), inputsLocalizacao()],
+        ),
+      ));
 
   Future<LocalModel> exibirPaginaDePesquisa(Prediction p) async {
     if (p != null) {
@@ -301,81 +298,78 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
     );
   }
 
-  Widget pageDados() {
-    print("pageDados");
-    return Container(
-        child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: <Widget>[
-          TextField(
-            controller: nomeGrupoTextController,
-            onChanged: controller.setNomeGrupo,
-            decoration: InputDecoration(labelText: "Nome"),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-                child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Observer(
-                  builder: (_) => Text(controller.nomeLocalPartida.isEmpty
-                      ? "Origem não informada"
-                      : controller.nomeLocalPartida),
+  Widget pageDados() => Container(
+          child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            TextField(
+              controller: nomeGrupoTextController,
+              onChanged: controller.setNomeGrupo,
+              decoration: InputDecoration(labelText: "Nome"),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                  child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Observer(
+                    builder: (_) => Text(controller.nomeLocalPartida.isEmpty
+                        ? "Origem não informada"
+                        : controller.nomeLocalPartida),
+                  ),
+                  Observer(
+                    builder: (_) => Text(controller.nomeLocalDestino.isEmpty
+                        ? "Destino não informado"
+                        : controller.nomeLocalDestino),
+                  ),
+                ],
+              )),
+            ),
+            Container(
+              child: Expanded(
+                child: Observer(
+                  builder: (_) {
+                    var contatosSelecionados = controller.contatosSelecionados;
+                    return ListView(
+                      children: contatosSelecionados.map((contact) {
+                        return listTileContact(contact);
+                      }).toList(),
+                    );
+                  },
                 ),
-                Observer(
-                  builder: (_) => Text(controller.nomeLocalDestino.isEmpty
-                      ? "Destino não informado"
-                      : controller.nomeLocalDestino),
-                ),
-              ],
-            )),
-          ),
-          Container(
-            child: Expanded(
-              child: Observer(
-                builder: (_) {
-                  var contatosSelecionados = controller.contatosSelecionados;
-                  return ListView(
-                    children: contatosSelecionados.map((contact) {
-                      return listTileContact(contact);
-                    }).toList(),
-                  );
-                },
               ),
             ),
-          ),
-          Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                SizedBox(
-                  width: 140,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      color: Theme.of(context).disabledColor,
-                      onPressed: controller.cancelar,
-                      child: Text("Cancelar"),
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  SizedBox(
+                    width: 140,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: RaisedButton(
+                        color: Theme.of(context).disabledColor,
+                        onPressed: () => Navigator.pop(context),
+                        child: Text("Cancelar"),
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: 140,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: RaisedButton(
-                      onPressed: () {},
-                      child: Text("Salvar"),
+                  SizedBox(
+                    width: 140,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: RaisedButton(
+                        onPressed: () {},
+                        child: Text("Salvar"),
+                      ),
                     ),
-                  ),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
-    ));
-  }
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+      ));
 }

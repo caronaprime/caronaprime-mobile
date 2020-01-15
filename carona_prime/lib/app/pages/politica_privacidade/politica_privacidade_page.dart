@@ -46,7 +46,7 @@ class PoliticaPrivacidadePage extends StatelessWidget {
 
                   return FlatButton(
                     child: Text(
-                      "Aceite os termso de uso",
+                      "Aceite os termos de uso",
                       style: textStyle,
                     ),
                     onPressed: null,

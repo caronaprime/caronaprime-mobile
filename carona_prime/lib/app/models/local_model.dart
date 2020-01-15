@@ -1,7 +1,8 @@
-import 'package:carona_prime/app/models/base_model.dart';
+import 'package:json_annotation/json_annotation.dart';
+part 'local_model.g.dart';
 
-class LocalModel extends BaseModel {
-  String _documentId;
+@JsonSerializable()
+class LocalModel {
   String nome;
   double longitude;
   double latitude;
@@ -10,22 +11,6 @@ class LocalModel extends BaseModel {
 
   LocalModel(this.nome, this.latitude, this.longitude, this.placeId);
 
-  @override
-  String documentId() => _documentId;
-
-  @override
-  toMap() {
-    var map = new Map<String, dynamic>();
-    map['nome'] = this.nome;
-    map['longitude'] = this.longitude;
-    map['latitude'] = this.latitude;
-    map['placeId'] = this.placeId;
-    map['enderecoFormatado'] = this.enderecoFormatado;
-    return map;
-  }
-
-  @override
-  String toString() {
-    return "Nome: ${this.nome}\nlatitude: ${this.latitude}\nlongitude: ${this.longitude}";
-  }
+  factory LocalModel.fromJson(Map<String, dynamic> json) => _$LocalModelFromJson(json);
+  Map<String, dynamic> toJson() => _$LocalModelToJson(this);
 }

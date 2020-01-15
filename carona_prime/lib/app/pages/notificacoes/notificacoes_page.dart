@@ -44,14 +44,14 @@ class NotificacoesPage extends StatelessWidget {
                 children: <Widget>[
                   FlatButton(
                     child: Text(
-                      "RECUSAR",
+                      "Recusar",
                       style: TextStyle(
                           color: Theme.of(context).textTheme.body1.color),
                     ),
                     onPressed: () => print("recusar"),
                   ),
                   FlatButton(
-                    child: Text("ACEITAR!"),
+                    child: Text("Aceitar!"),
                     onPressed: () => print("Quero carona"),
                   )
                 ],

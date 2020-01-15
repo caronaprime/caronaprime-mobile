@@ -71,9 +71,6 @@ abstract class NovoGrupoBase with Store {
   void setNomeGrupo(String value) => nomeGrupo = value;
 
   @action
-  cancelar() => print("implementar");
-
-  @action
   Future loadContacts() async {
     try {
       await SimplePermissions.requestPermission(Permission.ReadContacts);

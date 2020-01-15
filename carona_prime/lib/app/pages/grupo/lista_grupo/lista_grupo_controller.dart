@@ -1,5 +1,5 @@
-import 'package:carona_prime/app/models/grupo_model.dart';
-import 'package:carona_prime/app/models/local_model.dart';
+import 'package:carona_prime/app/shared/repositories/grupo_repository.dart';
+import 'package:carona_prime/app/shared/responses/lista_grupos_response.dart';
 import 'package:mobx/mobx.dart';
 
 part 'lista_grupo_controller.g.dart';
@@ -7,12 +7,19 @@ part 'lista_grupo_controller.g.dart';
 class ListaGrupoController = ListaGrupoBase with _$ListaGrupoController;
 
 abstract class ListaGrupoBase with Store {
+  var _repository = GrupoRepository();
+
   @observable
-  ObservableList<GrupoModel> grupos = ObservableList<GrupoModel>();
-  
-  @action 
-  void novoGrupoFake() {
-    grupos.add(GrupoModel("nome do grupo", LocalModel("Origem", 0, 0, ""),
-        LocalModel("Destino", 0, 0, ""), Duration(hours: 12)));
+  ObservableList<ListaGruposResponse> gruposResponse =
+      ObservableList<ListaGruposResponse>().asObservable();
+
+  @observable
+  bool consultou = false;
+
+  @action
+  Future carregarGrupos() async {
+    gruposResponse.clear();
+    gruposResponse.addAll(await _repository.getGrupos());
+    consultou = true;
   }
 }

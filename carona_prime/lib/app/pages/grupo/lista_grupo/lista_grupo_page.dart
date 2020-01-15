@@ -1,6 +1,5 @@
 import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_page.dart';
 import 'package:carona_prime/app/pages/grupo/lista_grupo/lista_grupo_controller.dart';
-import 'package:carona_prime/app/pages/grupo/novo_grupo/novo_grupo_page.dart';
 import 'package:carona_prime/app/pages/notificacoes/notificacoes_page.dart';
 import 'package:carona_prime/app/shared/widgets/default_drawer.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ class ListaGrupoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    controller.carregarGrupos();
     return Scaffold(
       drawer: DefaultDrawer(),
       appBar: AppBar(
@@ -24,26 +24,31 @@ class ListaGrupoPage extends StatelessWidget {
         ],
       ),
       body: Observer(builder: (_) {
-        if (controller.grupos == null || controller.grupos.length == 0)
+        if (controller.gruposResponse == null || controller.gruposResponse.length == 0)
           return Center(
-            child: Text("Você ainda não participa de nenhum grupo"),
-          );
+              child: Observer(
+            builder: (_) => controller.consultou
+                ? Text("Você ainda não participa de nenhum grupo")
+                : CircularProgressIndicator(),
+          ));
+
         return ListView(
-          children: controller.grupos
+          children: controller.gruposResponse
               .map((grupo) => ListTile(
                     onTap: () => Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => DetalhesGrupoPage())),
                     title: Text(grupo.nome),
                     subtitle:
-                        Text("${grupo.partida.nome} - ${grupo.destino.nome}"),
+                        Text("${grupo.partida} - ${grupo.destino}"),
                   ))
               .toList(),
         );
       }),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        onPressed: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => NovoGrupoPage())),
+        // onPressed: () => Navigator.of(context)
+        //     .push(MaterialPageRoute(builder: (context) => NovoGrupoPage())),
+        onPressed: () => controller.carregarGrupos(),
       ),
     );
   }
