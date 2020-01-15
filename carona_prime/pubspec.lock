@@ -70,9 +70,9 @@ packages:
       name: build_resolvers
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.3.0"
+    version: "1.3.1"
   build_runner:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: build_runner
       url: "https://pub.dartlang.org"
@@ -113,6 +113,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
+  chewie:
+    dependency: transitive
+    description:
+      name: chewie
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.9.8+1"
   cloud_firestore:
     dependency: "direct main"
     description:
@@ -183,6 +190,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.3"
+  expandable:
+    dependency: "direct main"
+    description:
+      name: expandable
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.2"
   firebase_auth:
     dependency: "direct main"
     description:
@@ -235,13 +249,18 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  font_awesome_flutter:
+  flutter_web_plugins:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
+  flutube:
     dependency: "direct main"
     description:
-      name: font_awesome_flutter
+      name: flutube
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.5.0"
+    version: "0.8.3"
   geocoder:
     dependency: "direct main"
     description:
@@ -348,12 +367,19 @@ packages:
     source: hosted
     version: "0.6.1+1"
   json_annotation:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: json_annotation
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
+  json_serializable:
+    dependency: "direct dev"
+    description:
+      name: json_serializable
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.2.5"
   location_permissions:
     dependency: transitive
     description:
@@ -417,6 +443,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1+2"
+  open_iconic_flutter:
+    dependency: transitive
+    description:
+      name: open_iconic_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   package_config:
     dependency: transitive
     description:
@@ -487,6 +520,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.22.4"
+  screen:
+    dependency: transitive
+    description:
+      name: screen
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.5"
   shelf:
     dependency: transitive
     description:
@@ -590,6 +630,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.8"
+  video_player:
+    dependency: transitive
+    description:
+      name: video_player
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.10.5+1"
+  video_player_platform_interface:
+    dependency: transitive
+    description:
+      name: video_player_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.4"
+  video_player_web:
+    dependency: transitive
+    description:
+      name: video_player_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.1+1"
   watcher:
     dependency: transitive
     description:
@@ -620,4 +681,4 @@ packages:
     version: "2.2.0"
 sdks:
   dart: ">=2.7.0 <3.0.0"
-  flutter: ">=1.5.0 <2.0.0"
+  flutter: ">=1.12.13+hotfix.4 <2.0.0"

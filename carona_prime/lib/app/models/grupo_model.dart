@@ -1,6 +1,10 @@
 import 'package:carona_prime/app/models/local_model.dart';
 import 'package:carona_prime/app/models/usuario_model.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'grupo_model.g.dart';
+
+@JsonSerializable()
 class GrupoModel {
   String nome;
   List<UsuarioModel> membros;
@@ -20,4 +24,7 @@ class GrupoModel {
   bool quinta;
   bool sexta;
   bool sabado;
+
+  factory GrupoModel.fromJson(Map<String, dynamic> json) => _$GrupoModelFromJson(json);
+  Map<String, dynamic> toJson() => _$GrupoModelToJson(this);
 }

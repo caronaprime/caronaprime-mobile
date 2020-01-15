@@ -1,8 +1,12 @@
-import 'package:carona_prime/app/pages/login/login_page.dart';
+import 'package:carona_prime/app/pages/inicio/inicio_controller.dart';
 import 'package:carona_prime/app/shared/widgets/logo_carona.dart';
 import 'package:flutter/material.dart';
 
 class WelcomePage extends StatefulWidget {
+  final PageController pageController;
+  final InicioController inicioController;
+
+  WelcomePage(this.inicioController, this.pageController);
   @override
   _WelcomePageState createState() => _WelcomePageState();
 }
@@ -23,10 +27,9 @@ class _WelcomePageState extends State<WelcomePage> {
               style: TextStyle(color: Colors.white),
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginPage()),
-              );
+              int nextIndex = 1;                            
+              widget.pageController.animateToPage(nextIndex, duration: Duration(milliseconds: 300), curve: Curves.decelerate);           
+              widget.inicioController.setPageIndex(nextIndex);
             },
           ),
         ],

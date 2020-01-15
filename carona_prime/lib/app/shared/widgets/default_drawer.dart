@@ -1,6 +1,8 @@
 import 'package:carona_prime/app/application_controller.dart';
+import 'package:carona_prime/app/pages/perguntas_frequentes/perguntas_frequentes_page.dart';
+import 'package:carona_prime/app/pages/politica_privacidade/politica_privacidade_page.dart';
+import 'package:carona_prime/app/pages/termos_uso/termos_uso_page.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get_it/get_it.dart';
 
 class DefaultDrawer extends StatelessWidget {
@@ -17,19 +19,29 @@ class DefaultDrawer extends StatelessWidget {
               child: Text("CP"),
             ),
           ),
+          ListTile(leading: Icon(Icons.settings), title: Text("Configurações")),
           ListTile(
-              leading: Icon(Icons.settings),
-              title: Text("Configurações"),
-              subtitle: Text("asdf")),
+              leading: Icon(Icons.assignment),
+              title: Text("Termos de Uso"),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => TermosUsoPage(null, null)))),
           ListTile(
-              leading: Icon(FontAwesomeIcons.map),
-              title: Text("Mapa"),
-              subtitle: Text("Configurações de mapas")),
+            leading: Icon(Icons.lock),
+            title: Text("Política de Privacidade"),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => PoliticaPrivacidadePage(null, null))),
+          ),
           ListTile(
-            leading: Icon(FontAwesomeIcons.doorOpen),
+            leading: Icon(Icons.help),
+            title: Text("Perguntas Frequentes"),
+            onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => PerguntasFrequentesPage())),
+          ),
+          ListTile(
+            leading: Icon(Icons.exit_to_app),
             title: Text("Sair"),
             onTap: applicationController.deslogar,
-          ),
+          )
         ],
       ),
     );

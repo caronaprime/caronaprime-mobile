@@ -1,9 +1,14 @@
+import 'package:carona_prime/app/pages/inicio/inicio_controller.dart';
 import 'package:carona_prime/app/pages/login/login_controller.dart';
 import 'package:carona_prime/app/shared/widgets/logo_carona.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
 class LoginPage extends StatelessWidget {
+  final PageController pageController;
+  final InicioController inicioController;
+  LoginPage(this.inicioController, this.pageController);
+
   final controller = LoginController();
 
   final phoneTextController = TextEditingController();
