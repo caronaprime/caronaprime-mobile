@@ -40,7 +40,30 @@ class DefaultDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.exit_to_app),
             title: Text("Sair"),
-            onTap: applicationController.deslogar,
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text("Confirmação"),
+                      content: Text("Tem certeza que deseja sair?"),
+                      actions: <Widget>[
+                        FlatButton(
+                            child: Text("Cancelar"),
+                            onPressed: () => Navigator.of(context).pop()),
+                        FlatButton(
+                          child: Text("Sair"),
+                          onPressed: () {
+                            applicationController.deslogar();
+                            while (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            }                            
+                          },
+                        )
+                      ],
+                    );
+                  });
+            },
           )
         ],
       ),
