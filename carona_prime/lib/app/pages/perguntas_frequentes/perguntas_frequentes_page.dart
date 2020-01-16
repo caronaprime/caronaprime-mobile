@@ -1,6 +1,7 @@
+import 'package:chewie/chewie.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutube/flutube.dart';
+import 'package:video_player/video_player.dart';
 
 class PerguntasFrequentesPage extends StatelessWidget {
   const PerguntasFrequentesPage({Key key}) : super(key: key);
@@ -25,15 +26,16 @@ class PerguntasFrequentesPage extends StatelessWidget {
                 "Quisque dapibus ultrices nulla nec pharetra. Quisque pharetra sapien at tincidunt pretium. In ultricies blandit odio."),
             perguntaFrequente(context, "Como entro em um grupo?",
                 "Nunc a dignissim tellus. Interdum et malesuada fames ac ante ipsum primis in faucibus"),
-            Text("Veja o mini tutorial:"),
-            FluTube(
-              'https://www.youtube.com/watch?v=lkF0TQJO0bA&list=PLOU2XLYxmsIL0pH0zWe_ZOHgGhZ7UasUE',
-              aspectRatio: 16 / 9,
-              autoPlay: false,
-              looping: false,
-              onVideoStart: () {},
-              onVideoEnd: () {},
-            ),
+            Text("Veja o mini tutorial:"),            
+            Chewie(
+                controller: ChewieController(
+                  videoPlayerController: VideoPlayerController.network(
+                      'https://www.youtube.com/watch?v=lkF0TQJO0bA&list=PLOU2XLYxmsIL0pH0zWe_ZOHgGhZ7UasUE'),
+                  aspectRatio: 16 / 9,
+                  autoPlay: false,
+                  looping: false,
+                ),
+              ),
           ],
         ),
       ),
