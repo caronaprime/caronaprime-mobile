@@ -1,5 +1,5 @@
 import 'package:carona_prime/app/application_controller.dart';
-import 'package:carona_prime/app/pages/login/login_controller.dart';
+import 'package:carona_prime/app/models/usuario_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 
@@ -33,8 +33,8 @@ class LoginRepository {
 
       AuthResult authResult = await _auth.signInWithCredential(credential);
       FirebaseUser user = authResult.user;
-      print('Usuário logado com sucesso $user');
-      applicationController.logar();
+      print('Usuário logado com sucesso $user');      
+      applicationController.logar(UsuarioModel(user.displayName, user.phoneNumber));
       return true;
     } catch (e) {      
       return false;
@@ -42,8 +42,7 @@ class LoginRepository {
   }
 
   _verificationCompleted(AuthCredential phoneAuthCredential) {
-    _auth.signInWithCredential(phoneAuthCredential);
-    applicationController.logar();    
+    _auth.signInWithCredential(phoneAuthCredential);       
   }
 
   _verificationFailed(AuthException authException) {

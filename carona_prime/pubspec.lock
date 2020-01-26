@@ -114,7 +114,7 @@ packages:
     source: hosted
     version: "1.0.2"
   chewie:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: chewie
       url: "https://pub.dartlang.org"
@@ -254,13 +254,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutube:
-    dependency: "direct main"
-    description:
-      name: flutube
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.8.3"
   geocoder:
     dependency: "direct main"
     description:
@@ -631,7 +624,7 @@ packages:
     source: hosted
     version: "2.0.8"
   video_player:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: video_player
       url: "https://pub.dartlang.org"

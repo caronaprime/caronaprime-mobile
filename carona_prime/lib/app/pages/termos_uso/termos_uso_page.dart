@@ -1,8 +1,9 @@
 import 'package:carona_prime/app/pages/inicio/inicio_controller.dart';
 import 'package:carona_prime/app/pages/termos_uso/termos_uso_controller.dart';
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutube/flutube.dart';
+import 'package:video_player/video_player.dart';
 
 class TermosUsoPage extends StatelessWidget {
   final PageController pageController;
@@ -44,7 +45,7 @@ class TermosUsoPage extends StatelessWidget {
 
                   return FlatButton(
                     child: Text(
-                      "Aceite os termso de uso",
+                      "Aceite os termos de uso",
                       style: textStyle,
                     ),
                     onPressed: null,
@@ -75,13 +76,14 @@ class TermosUsoPage extends StatelessWidget {
               ),
               Text(
                   "Pontos importantes sobre o uso e funcionamento do aplicativo"),
-              FluTube(
-                'https://www.youtube.com/watch?v=lkF0TQJO0bA&list=PLOU2XLYxmsIL0pH0zWe_ZOHgGhZ7UasUE',
-                aspectRatio: 16 / 9,
-                autoPlay: false,
-                looping: false,
-                onVideoStart: () {},
-                onVideoEnd: () {},
+              Chewie(
+                controller: ChewieController(
+                  videoPlayerController: VideoPlayerController.network(
+                      'https://www.youtube.com/watch?v=lkF0TQJO0bA&list=PLOU2XLYxmsIL0pH0zWe_ZOHgGhZ7UasUE'),
+                  aspectRatio: 16 / 9,
+                  autoPlay: false,
+                  looping: false,
+                ),
               ),
               esconder
                   ? Container()
