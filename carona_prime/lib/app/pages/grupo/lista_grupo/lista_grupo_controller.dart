@@ -18,6 +18,7 @@ abstract class ListaGrupoBase with Store {
 
   @action
   Future carregarGrupos() async {
+    consultou = false;
     gruposResponse.clear();
     gruposResponse.addAll(await _repository.getGrupos());
     consultou = true;

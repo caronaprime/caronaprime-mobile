@@ -1,5 +1,6 @@
 import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_page.dart';
 import 'package:carona_prime/app/pages/grupo/lista_grupo/lista_grupo_controller.dart';
+import 'package:carona_prime/app/pages/grupo/novo_grupo/novo_grupo_page.dart';
 import 'package:carona_prime/app/pages/notificacoes/notificacoes_page.dart';
 import 'package:carona_prime/app/shared/widgets/default_drawer.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,8 @@ class ListaGrupoPage extends StatelessWidget {
         ],
       ),
       body: Observer(builder: (_) {
-        if (controller.gruposResponse == null || controller.gruposResponse.length == 0)
+        if (controller.gruposResponse == null ||
+            controller.gruposResponse.length == 0)
           return Center(
               child: Observer(
             builder: (_) => controller.consultou
@@ -35,20 +37,23 @@ class ListaGrupoPage extends StatelessWidget {
         return ListView(
           children: controller.gruposResponse
               .map((grupo) => ListTile(
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => DetalhesGrupoPage())),
+                    onTap: () => Navigator.of(context).push<bool>(
+                        MaterialPageRoute(
+                            builder: (context) => DetalhesGrupoPage(grupo.id))),
                     title: Text(grupo.nome),
                     subtitle:
-                        Text("${grupo.partida} - ${grupo.destino}"),
+                        Text("${grupo.partida.nome} - ${grupo.destino.nome}"),
                   ))
               .toList(),
         );
       }),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        // onPressed: () => Navigator.of(context)
-        //     .push(MaterialPageRoute(builder: (context) => NovoGrupoPage())),
-        onPressed: () => controller.carregarGrupos(),
+        onPressed: () async {
+          var inseriu = await Navigator.of(context).push<bool>(
+              MaterialPageRoute(builder: (context) => NovoGrupoPage()));
+          if (inseriu) controller.carregarGrupos();
+        },
       ),
     );
   }

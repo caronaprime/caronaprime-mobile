@@ -5,8 +5,9 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 
 class DetalhesGrupoPage extends StatelessWidget {
+  DetalhesGrupoPage(this.grupoId);
+  final int grupoId;
   final controller = DetalhesGrupoController();
-
   final vagasDisponiveis = [1, 2, 3, 4, 5, 6];
 
   @override
@@ -205,7 +206,7 @@ class DetalhesGrupoPage extends StatelessWidget {
         children: membros
             .map((membro) => ListTile(
                 title: Text(membro.nome),
-                subtitle: Text(membro.numeroCelelular),
+                subtitle: Text(membro.celular),
                 leading: CircleAvatar(
                   child: Text(membro.nome[0]),
                 )))

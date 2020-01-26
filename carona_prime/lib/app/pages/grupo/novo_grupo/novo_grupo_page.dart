@@ -13,6 +13,7 @@ class NovoGrupoPage extends StatefulWidget {
 }
 
 class _NovoGrupoPageState extends State<NovoGrupoPage> {
+  final _formKey = GlobalKey<FormState>();
   final localPartidaTextController = TextEditingController();
   final localDestinoTextController = TextEditingController();
   final nomeGrupoTextController = TextEditingController();
@@ -39,8 +40,9 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                   ? "Novo Grupo"
                   : controller.nomeGrupo)),
         ),
-        body: Observer(
-          builder: (_) => PageView(
+        body: Form(
+          key: _formKey,
+          child: PageView(
               physics: NeverScrollableScrollPhysics(),
               controller: pageController,
               pageSnapping: true,
@@ -80,6 +82,9 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   Widget pageSelecionarContatos() {
     return Observer(
       builder: (_) {
+        if (!controller.carregouContato)
+          return Center(child: CircularProgressIndicator());
+
         return Container(
           child: controller.todosContatos == null ||
                   controller.todosContatos.isEmpty
@@ -89,7 +94,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.all(8),
-                        child: TextField(
+                        child: TextFormField(
+                          validator: controller.textNotEmptyValidator,
                           controller: buscarContatosTextController,
                           onChanged: controller.setQuery,
                           decoration: InputDecoration(
@@ -192,7 +198,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   }
 
   editSelecionarDestino() {
-    return TextField(
+    return TextFormField(
+      validator: controller.textNotEmptyValidator,
       controller: localDestinoTextController,
       onTap: () async {
         Prediction p = await PlacesAutocomplete.show(
@@ -213,7 +220,8 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   }
 
   editSelecionarPartida() {
-    return TextField(
+    return TextFormField(
+      validator: controller.textNotEmptyValidator,
       controller: localPartidaTextController,
       onTap: () async {
         Prediction p = await PlacesAutocomplete.show(
@@ -303,11 +311,11 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: <Widget>[
-            TextField(
-              controller: nomeGrupoTextController,
-              onChanged: controller.setNomeGrupo,
-              decoration: InputDecoration(labelText: "Nome"),
-            ),
+            TextFormField(
+                controller: nomeGrupoTextController,
+                onChanged: controller.setNomeGrupo,
+                decoration: InputDecoration(labelText: "Nome"),
+                validator: controller.textNotEmptyValidator),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
@@ -360,9 +368,23 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                     width: 140,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        onPressed: () {},
-                        child: Text("Salvar"),
+                      child: Builder(
+                        builder: (context) => RaisedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState.validate()) {
+                              var sucesso = await controller.salvar();
+                              if (sucesso) {                                
+                                Navigator.of(context).pop(true);
+                              } else {
+                                Scaffold.of(context).showSnackBar(SnackBar(
+                                  content: Text(
+                                      "Ocorreu um erro desconhecido ao salvar o grupo, favor veirifique as informações."),
+                                ));
+                              }
+                            }
+                          },
+                          child: Text("Salvar"),
+                        ),
                       ),
                     ),
                   )
