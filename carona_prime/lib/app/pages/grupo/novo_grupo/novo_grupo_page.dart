@@ -359,7 +359,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                       padding: const EdgeInsets.all(8.0),
                       child: RaisedButton(
                         color: Theme.of(context).disabledColor,
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => Navigator.of(context).pop(false),
                         child: Text("Cancelar"),
                       ),
                     ),

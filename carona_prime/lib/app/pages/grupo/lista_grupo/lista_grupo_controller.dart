@@ -3,7 +3,6 @@ import 'package:carona_prime/app/shared/responses/lista_grupos_response.dart';
 import 'package:mobx/mobx.dart';
 
 part 'lista_grupo_controller.g.dart';
-
 class ListaGrupoController = ListaGrupoBase with _$ListaGrupoController;
 
 abstract class ListaGrupoBase with Store {
