@@ -1,7 +1,9 @@
 import 'package:carona_prime/app/models/usuario_model.dart';
 import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_controller.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:intl/intl.dart';
 import 'package:mobx/mobx.dart';
 
 class DetalhesGrupoPage extends StatelessWidget {
@@ -12,6 +14,7 @@ class DetalhesGrupoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    controller.carregarGrupo(grupoId);
     return Scaffold(
       appBar: AppBar(title: Text("Nome do Grupo")),
       body: Observer(
@@ -48,9 +51,13 @@ class DetalhesGrupoPage extends StatelessWidget {
     return Column(
       children: <Widget>[
         Container(
-          height: 40,
+          height: 60,
           child: Center(
-              child: Text("Origem: - Destino: ",
+              child: Text(
+                  controller.partida?.nome != null &&
+                          controller.destino?.nome != null
+                      ? "Origem: ${controller.partida?.nome} - Destino: ${controller.destino?.nome}"
+                      : "Origem e Destino não informados",
                   style: Theme.of(context).textTheme.title)),
         ),
         Expanded(
@@ -118,9 +125,13 @@ class DetalhesGrupoPage extends StatelessWidget {
     return Column(
       children: <Widget>[
         Container(
-          height: 40,
+          height: 60,
           child: Center(
-              child: Text("Origem: - Destino: ",
+              child: Text(
+                  controller.partida?.nome != null &&
+                          controller.destino?.nome != null
+                      ? "Origem: ${controller.partida?.nome} - Destino: ${controller.destino?.nome}"
+                      : "Origem e Destino não informados",
                   style: Theme.of(context).textTheme.title)),
         ),
         Expanded(
@@ -131,41 +142,107 @@ class DetalhesGrupoPage extends StatelessWidget {
                   child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  opcaoAdicionalButton("Carro Adaptado", context,
-                      checked: true,
-                      iconData: Icons.accessible,
-                      onTap: () => print("Implementar")),
-                  opcaoAdicionalButton("Porta-malas livre", context,
-                      checked: false,
-                      iconData: Icons.shopping_cart,
-                      onTap: () => print("Implementar"))
+                  Observer(
+                    builder: (_) => opcaoAdicionalButton(
+                        "Carro Adaptado", context,
+                        checked: controller.carroAdaptado,
+                        iconData: Icons.accessible,
+                        onTap: () => controller
+                            .setCarroAdaptado(!controller.carroAdaptado)),
+                  ),
+                  Observer(
+                      builder: (_) => opcaoAdicionalButton(
+                            "Porta-malas livre",
+                            context,
+                            checked: controller.portaMalasLivre,
+                            iconData: Icons.shopping_cart,
+                            onTap: () => controller.setPortaMalasLivre(
+                                !controller.portaMalasLivre),
+                          ))
                 ],
               )),
               Column(
                 children: <Widget>[
                   Text("Vagas disponíveis",
                       style: TextStyle(color: Theme.of(context).accentColor)),
-                  DropdownButton(
-                    onChanged: (i) => print(i),
-                    items: vagasDisponiveis
-                        .map((n) => DropdownMenuItem(
-                            child: Text(n.toString()), value: n))
-                        .toList(),
-                  ),
+                  Observer(
+                      builder: (_) => DropdownButton(
+                            value: controller.vagasDisponiveis,
+                            onChanged: (i) => controller.setVagasDisponiveis,
+                            items: vagasDisponiveis
+                                .map((n) => DropdownMenuItem(
+                                    child: Text(n.toString()), value: n))
+                                .toList(),
+                          )),
                 ],
+              ),
+              Container(
+                width: 150,
+                child: DateTimeField(
+                    decoration: InputDecoration(
+                        border: Theme.of(context).inputDecorationTheme.border,
+                        contentPadding: Theme.of(context)
+                            .inputDecorationTheme
+                            .contentPadding,
+                        labelStyle:
+                            Theme.of(context).inputDecorationTheme.labelStyle),
+                    format: DateFormat("HH:mm"),
+                    onChanged: (value) {
+                      if (value == null) {
+                        controller.setHora(null);
+                      } else {
+                        controller.setHora(
+                            TimeOfDay(hour: value.hour, minute: value.minute));
+                      }
+                    },
+                    onShowPicker: (context, currentValue) async {
+                      TimeOfDay time = await showTimePicker(
+                        context: context,
+                        initialTime:
+                            controller.hora ?? TimeOfDay(hour: 00, minute: 00),
+                        builder: (BuildContext context, Widget child) {
+                          return MediaQuery(
+                            data: MediaQuery.of(context)
+                                .copyWith(alwaysUse24HourFormat: true),
+                            child: child,
+                          );
+                        },
+                      );
+                      return DateTimeField.convert(time);
+                    }),
               ),
               GestureDetector(
                 onTap: () => mostrarDialogoDias(context),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    Text("Horário: 10:00h",
-                        style: TextStyle(color: Theme.of(context).accentColor)),
                     Text("Dias"),
-                    Text("Segunda-feira"),
-                    Text("Terça-feira"),
-                    Text("Quarta-feira"),
-                    Text("Quinta-feira"),
+                    Observer(
+                        builder: (_) =>
+                            controller.domingo ? Text("Domingo") : Container()),
+                    Observer(
+                        builder: (_) => controller.segunda
+                            ? Text("Segunda-feira")
+                            : Container()),
+                    Observer(
+                        builder: (_) => controller.terca
+                            ? Text("Terça-feira")
+                            : Container()),
+                    Observer(
+                        builder: (_) => controller.quarta
+                            ? Text("Quarta-feira")
+                            : Container()),
+                    Observer(
+                        builder: (_) => controller.quinta
+                            ? Text("Quinta-feira")
+                            : Container()),
+                    Observer(
+                        builder: (_) => controller.sexta
+                            ? Text("Sexta-feira")
+                            : Container()),
+                    Observer(
+                        builder: (_) =>
+                            controller.sabado ? Text("Sábado") : Container()),
                   ],
                 ),
               ),
@@ -177,15 +254,15 @@ class DetalhesGrupoPage extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              FlatButton(
-                child: Text("Cancelar",
-                    style: TextStyle(
-                        color: Theme.of(context).textTheme.body1.color)),
-                onPressed: () => print("implementar"),
-              ),
-              FlatButton(
-                child: Text("Compartilhar Carona!"),
-                onPressed: () => print("implementar"),
+              AnimatedContainer(
+                duration: Duration(milliseconds: 500),
+                width: controller.compartilhando ? 90 : 200,
+                child: RaisedButton(
+                  child: controller.compartilhando
+                      ? CircularProgressIndicator(backgroundColor: Colors.white)
+                      : Text("Compartilhar Carona"),
+                  onPressed: () => controller.compartilharCarona(grupoId),
+                ),
               )
             ],
           ),
@@ -231,50 +308,63 @@ class DetalhesGrupoPage extends StatelessWidget {
             content: Container(
               child: Column(
                 children: <Widget>[
-                  checkBoxLabel(
-                      label: "Marcar Todos",
-                      value: true,
-                      onChanged: (_) => print("asdf")),
-                  checkBoxLabel(
-                      label: "Domingo",
-                      value: true,
-                      onChanged: (_) => print("asdf")),
-                  checkBoxLabel(
-                      label: "Segunda-Feira",
-                      value: true,
-                      onChanged: (_) => print("asdf")),
-                  checkBoxLabel(
-                      label: "Terça-Feira",
-                      value: true,
-                      onChanged: (_) => print("asdf")),
-                  checkBoxLabel(
-                      label: "Quarta-Feira",
-                      value: true,
-                      onChanged: (_) => print("asdf")),
-                  checkBoxLabel(
-                      label: "Quinta-Feira",
-                      value: true,
-                      onChanged: (_) => print("asdf")),
-                  checkBoxLabel(
-                      label: "Sexta-Feira",
-                      value: true,
-                      onChanged: (_) => print("asdf")),
-                  checkBoxLabel(
-                      label: "Sábado",
-                      value: true,
-                      onChanged: (_) => print("asdf")),
+                  Observer(
+                    builder: (_) => checkBoxLabel(
+                        label: "Repetir Semanalmente",
+                        value: controller.repetirSemanalmente,
+                        onChanged: (_) => controller.setRepetirSemanalmente(
+                            !controller.repetirSemanalmente)),
+                  ),
+                  Observer(
+                      builder: (_) => checkBoxLabel(
+                          label: "Domingo",
+                          value: controller.domingo,
+                          onChanged: (_) =>
+                              controller.setDomingo(!controller.domingo))),
+                  Observer(
+                      builder: (_) => checkBoxLabel(
+                          label: "Segunda-Feira",
+                          value: controller.segunda,
+                          onChanged: (_) =>
+                              controller.setSegunda(!controller.segunda))),
+                  Observer(
+                      builder: (_) => checkBoxLabel(
+                          label: "Terça-Feira",
+                          value: controller.terca,
+                          onChanged: (_) =>
+                              controller.setTerca(!controller.terca))),
+                  Observer(
+                      builder: (_) => checkBoxLabel(
+                          label: "Quarta-Feira",
+                          value: controller.quarta,
+                          onChanged: (_) =>
+                              controller.setQuarta(!controller.quarta))),
+                  Observer(
+                      builder: (_) => checkBoxLabel(
+                          label: "Quinta-Feira",
+                          value: controller.quinta,
+                          onChanged: (_) =>
+                              controller.setQuinta(!controller.quinta))),
+                  Observer(
+                      builder: (_) => checkBoxLabel(
+                          label: "Sexta-Feira",
+                          value: controller.sexta,
+                          onChanged: (_) =>
+                              controller.setSexta(!controller.sexta))),
+                  Observer(
+                      builder: (_) => checkBoxLabel(
+                          label: "Sábado",
+                          value: controller.sabado,
+                          onChanged: (_) =>
+                              controller.setSabado(!controller.sabado))),
                 ],
               ),
             ),
             actions: <Widget>[
               FlatButton(
                   textTheme: ButtonTextTheme.primary,
-                  child: Text("Fechar"),
-                  onPressed: () => Navigator.of(context).pop()),
-              FlatButton(
-                  textTheme: ButtonTextTheme.primary,
                   child: Text("Ok"),
-                  onPressed: () => print("implementar")),
+                  onPressed: () => Navigator.of(context).pop()),
             ],
           );
         });
@@ -305,6 +395,7 @@ class DetalhesGrupoPage extends StatelessWidget {
               ),
               Text(
                 label,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: checked
                       ? Theme.of(context).backgroundColor

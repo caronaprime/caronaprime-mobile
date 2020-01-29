@@ -20,7 +20,8 @@ abstract class ListaGrupoBase with Store {
   Future carregarGrupos() async {
     consultou = false;
     gruposResponse.clear();
-    gruposResponse.addAll(await _repository.getGrupos());
+    var grupos = await _repository.getGrupos();
+    if (grupos != null) gruposResponse.addAll(grupos);
     consultou = true;
   }
 }

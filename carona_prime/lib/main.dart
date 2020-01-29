@@ -7,7 +7,8 @@ import 'package:get_it/get_it.dart';
 void main() {
   var getIt = GetIt.I;
   getIt.registerSingleton<ApplicationController>(ApplicationController());
-  getIt.registerSingleton<DefaultUrl>(DefaultUrl("https://carona-prime-9f9fb.appspot.com"));
+  getIt.registerSingleton<DefaultUrl>(
+      DefaultUrl("https://carona-prime-9f9fb.appspot.com"));
 
   runApp(AppWidget());
 }

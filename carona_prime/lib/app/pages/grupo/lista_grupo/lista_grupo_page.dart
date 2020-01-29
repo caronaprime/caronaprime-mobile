@@ -52,7 +52,7 @@ class ListaGrupoPage extends StatelessWidget {
         onPressed: () async {
           var inseriu = await Navigator.of(context).push<bool>(
               MaterialPageRoute(builder: (context) => NovoGrupoPage()));
-          if (inseriu) controller.carregarGrupos();
+          if (inseriu != null && inseriu) controller.carregarGrupos();
         },
       ),
     );
