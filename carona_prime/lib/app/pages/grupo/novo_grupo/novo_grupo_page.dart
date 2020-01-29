@@ -373,12 +373,15 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                           onPressed: () async {
                             if (_formKey.currentState.validate()) {
                               var sucesso = await controller.salvar();
-                              if (sucesso) {                                
+                              if (sucesso) {
                                 Navigator.of(context).pop(true);
                               } else {
                                 Scaffold.of(context).showSnackBar(SnackBar(
                                   content: Text(
-                                      "Ocorreu um erro desconhecido ao salvar o grupo, favor veirifique as informações."),
+                                    "Ocorreu um erro desconhecido ao salvar o grupo, favor veirifique as informações.",
+                                    style: TextStyle(
+                                        color: Theme.of(context).errorColor),
+                                  ),
                                 ));
                               }
                             }

@@ -21,7 +21,6 @@ class NovoGrupoController = NovoGrupoBase with _$NovoGrupoController;
 abstract class NovoGrupoBase with Store {
   var _repository = GrupoRepository();
   var applicationController = GetIt.I.get<ApplicationController>();
-  var _salvado = false;
 
   @observable
   bool carregouContato = false;
@@ -99,10 +98,6 @@ abstract class NovoGrupoBase with Store {
 
   @action
   Future<bool> salvar() async {
-    if (_salvado) return false;
-
-    _salvado = true;
-
     if (tudoPreenchido()) {
       var membros = contatosSelecionados
           .map((c) => MembroGrupoModel(
@@ -126,7 +121,6 @@ abstract class NovoGrupoBase with Store {
       var response = await _repository.postGrupo(grupo);
       return (response >= 200 && response < 300);
     }
-    _salvado = false;
     return true;
   }
 

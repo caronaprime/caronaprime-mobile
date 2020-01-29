@@ -56,7 +56,7 @@ class DetalhesGrupoPage extends StatelessWidget {
               child: Text(
                   controller.partida?.nome != null &&
                           controller.destino?.nome != null
-                      ? "Origem: ${controller.partida?.nome} - Destino:${controller.destino?.nome}"
+                      ? "Origem: ${controller.partida?.nome} - Destino: ${controller.destino?.nome}"
                       : "Origem e Destino não informados",
                   style: Theme.of(context).textTheme.title)),
         ),
@@ -125,9 +125,13 @@ class DetalhesGrupoPage extends StatelessWidget {
     return Column(
       children: <Widget>[
         Container(
-          height: 40,
+          height: 60,
           child: Center(
-              child: Text("Origem: - Destino: ",
+              child: Text(
+                  controller.partida?.nome != null &&
+                          controller.destino?.nome != null
+                      ? "Origem: ${controller.partida?.nome} - Destino: ${controller.destino?.nome}"
+                      : "Origem e Destino não informados",
                   style: Theme.of(context).textTheme.title)),
         ),
         Expanded(
@@ -183,6 +187,14 @@ class DetalhesGrupoPage extends StatelessWidget {
                         labelStyle:
                             Theme.of(context).inputDecorationTheme.labelStyle),
                     format: DateFormat("HH:mm"),
+                    onChanged: (value) {
+                      if (value == null) {
+                        controller.setHora(null);
+                      } else {
+                        controller.setHora(
+                            TimeOfDay(hour: value.hour, minute: value.minute));
+                      }
+                    },
                     onShowPicker: (context, currentValue) async {
                       TimeOfDay time = await showTimePicker(
                         context: context,
@@ -196,7 +208,6 @@ class DetalhesGrupoPage extends StatelessWidget {
                           );
                         },
                       );
-                      if (time != null) controller.setHora(time);
                       return DateTimeField.convert(time);
                     }),
               ),
@@ -243,15 +254,15 @@ class DetalhesGrupoPage extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              FlatButton(
-                child: Text("Cancelar",
-                    style: TextStyle(
-                        color: Theme.of(context).textTheme.body1.color)),
-                onPressed: () => print("implementar"),
-              ),
-              FlatButton(
-                child: Text("Compartilhar Carona!"),
-                onPressed: () => print("implementar"),
+              AnimatedContainer(
+                duration: Duration(milliseconds: 500),
+                width: controller.compartilhando ? 90 : 200,
+                child: RaisedButton(
+                  child: controller.compartilhando
+                      ? CircularProgressIndicator(backgroundColor: Colors.white)
+                      : Text("Compartilhar Carona"),
+                  onPressed: () => controller.compartilharCarona(grupoId),
+                ),
               )
             ],
           ),
