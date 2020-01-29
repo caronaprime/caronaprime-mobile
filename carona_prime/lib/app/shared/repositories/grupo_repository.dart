@@ -9,23 +9,40 @@ class GrupoRepository {
   var dio = Dio();
 
   Future<List<ListaGruposResponse>> getGrupos() async {
-    var response = await dio.get(dioClient.url + "/grupos");
-    var grupos = List<ListaGruposResponse>();
-    for (var grupoJson in response.data) {
-      var grupo = ListaGruposResponse.fromJson(grupoJson);
-      grupos.add(grupo);
+    try {
+      var response = await dio.get(dioClient.url + "/grupos");
+      var grupos = List<ListaGruposResponse>();
+      for (var grupoJson in response.data) {
+        var grupo = ListaGruposResponse.fromJson(grupoJson);
+        grupos.add(grupo);
+      }
+      return grupos;
+    } catch (e) {
+      return null;
     }
-    return grupos;
+  }
+
+  Future<GrupoModel> getGrupo(int grupoId) async {
+    if (grupoId > 0) {
+      try {
+        var response = await dio.get(dioClient.url + "/grupos/$grupoId");
+        var grupo = GrupoModel.fromJson(response.data);
+        return grupo;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   }
 
   Future<int> postGrupo(GrupoModel grupo) async {
     try {
-      var json = grupo.toJson();
+      var json = grupo.toJson();      
       var response = await dio.post(dioClient.url + "/grupos", data: json);
       return response.statusCode;
     } on DioError catch (e) {
       print(e.message);
       return e.response.statusCode;
-    }    
+    }
   }
 }

@@ -14,6 +14,7 @@ class DetalhesGrupoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    controller.carregarGrupo(grupoId);
     return Scaffold(
       appBar: AppBar(title: Text("Nome do Grupo")),
       body: Observer(
@@ -50,9 +51,13 @@ class DetalhesGrupoPage extends StatelessWidget {
     return Column(
       children: <Widget>[
         Container(
-          height: 40,
+          height: 60,
           child: Center(
-              child: Text("Origem: - Destino: ",
+              child: Text(
+                  controller.partida?.nome != null &&
+                          controller.destino?.nome != null
+                      ? "Origem: ${controller.partida?.nome} - Destino:${controller.destino?.nome}"
+                      : "Origem e Destino não informados",
                   style: Theme.of(context).textTheme.title)),
         ),
         Expanded(
@@ -167,8 +172,8 @@ class DetalhesGrupoPage extends StatelessWidget {
                           )),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
+              Container(
+                width: 150,
                 child: DateTimeField(
                     decoration: InputDecoration(
                         border: Theme.of(context).inputDecorationTheme.border,
@@ -179,9 +184,19 @@ class DetalhesGrupoPage extends StatelessWidget {
                             Theme.of(context).inputDecorationTheme.labelStyle),
                     format: DateFormat("HH:mm"),
                     onShowPicker: (context, currentValue) async {
-                      var time = await showTimePicker(
-                          context: context,
-                          initialTime: TimeOfDay(hour: 10, minute: 10));
+                      TimeOfDay time = await showTimePicker(
+                        context: context,
+                        initialTime:
+                            controller.hora ?? TimeOfDay(hour: 00, minute: 00),
+                        builder: (BuildContext context, Widget child) {
+                          return MediaQuery(
+                            data: MediaQuery.of(context)
+                                .copyWith(alwaysUse24HourFormat: true),
+                            child: child,
+                          );
+                        },
+                      );
+                      if (time != null) controller.setHora(time);
                       return DateTimeField.convert(time);
                     }),
               ),
@@ -337,12 +352,8 @@ class DetalhesGrupoPage extends StatelessWidget {
             actions: <Widget>[
               FlatButton(
                   textTheme: ButtonTextTheme.primary,
-                  child: Text("Fechar"),
-                  onPressed: () => Navigator.of(context).pop()),
-              FlatButton(
-                  textTheme: ButtonTextTheme.primary,
                   child: Text("Ok"),
-                  onPressed: () => print("implementar")),
+                  onPressed: () => Navigator.of(context).pop()),
             ],
           );
         });
@@ -373,6 +384,7 @@ class DetalhesGrupoPage extends StatelessWidget {
               ),
               Text(
                 label,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: checked
                       ? Theme.of(context).backgroundColor

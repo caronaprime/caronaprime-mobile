@@ -3,6 +3,7 @@ import 'package:carona_prime/app/shared/responses/lista_grupos_response.dart';
 import 'package:mobx/mobx.dart';
 
 part 'lista_grupo_controller.g.dart';
+
 class ListaGrupoController = ListaGrupoBase with _$ListaGrupoController;
 
 abstract class ListaGrupoBase with Store {
@@ -19,7 +20,8 @@ abstract class ListaGrupoBase with Store {
   Future carregarGrupos() async {
     consultou = false;
     gruposResponse.clear();
-    gruposResponse.addAll(await _repository.getGrupos());
+    var grupos = await _repository.getGrupos();
+    if (grupos != null) gruposResponse.addAll(grupos);
     consultou = true;
   }
 }

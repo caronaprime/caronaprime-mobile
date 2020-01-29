@@ -1,4 +1,6 @@
+import 'package:carona_prime/app/models/local_model.dart';
 import 'package:carona_prime/app/models/usuario_model.dart';
+import 'package:carona_prime/app/shared/repositories/grupo_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 
@@ -8,6 +10,8 @@ class DetalhesGrupoController = DetalhesGrupoBase
     with _$DetalhesGrupoController;
 
 abstract class DetalhesGrupoBase with Store {
+  var _repository = GrupoRepository();
+
   @observable
   int pageIndex = 0;
 
@@ -48,11 +52,13 @@ abstract class DetalhesGrupoBase with Store {
   bool repetirSemanalmente = true;
 
   @observable
-  ObservableList<UsuarioModel> membros = [
-    UsuarioModel("Riquelminho Gaucho", "999423412349"),
-    UsuarioModel("Cristiano Messi", "6599942002"),
-    UsuarioModel("Lionel Ronaldo", "6623450403"),
-  ].asObservable();
+  LocalModel partida;
+
+  @observable
+  LocalModel destino;
+
+  @observable
+  ObservableList<UsuarioModel> membros = ObservableList<UsuarioModel>();
 
   @action
   void setPortaMalasLivre(bool value) => portaMalasLivre = value;
@@ -89,6 +95,21 @@ abstract class DetalhesGrupoBase with Store {
 
   @action
   void setPageIndex(int newPageIndex) => pageIndex = newPageIndex;
+
+  @action
+  void setHora(TimeOfDay value) => hora = value;
+
+  @action
+  Future carregarGrupo(int grupoId) async {
+    var grupo = await _repository.getGrupo(grupoId);
+    var grupoMembros = grupo.membros.map((m) => UsuarioModel(
+        m.usuario?.nome ?? "Nome não informado", m.usuario?.celular));
+    membros.clear();
+    membros.addAll(
+        grupoMembros.where((t) => t.celular != null && t.celular.isNotEmpty));
+    partida = grupo.partida;
+    destino = grupo.destino;
+  }
 
   @computed
   String get horarioString {
