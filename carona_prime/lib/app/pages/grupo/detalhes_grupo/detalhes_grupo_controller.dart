@@ -17,6 +17,9 @@ abstract class DetalhesGrupoBase with Store {
   var applicationController = GetIt.I.get<ApplicationController>();
 
   @observable
+  bool usuarioEhAdministrador = false;
+
+  @observable
   int pageIndex = 0;
 
   @observable
@@ -110,12 +113,18 @@ abstract class DetalhesGrupoBase with Store {
   Future carregarGrupo(int grupoId) async {
     var grupo = await _repository.getGrupo(grupoId);
     var grupoMembros = grupo.membros.map((m) => UsuarioModel(
-        m.usuario?.nome ?? "Nome não informado", m.usuario?.celular));
+        m.usuario?.nome ?? "Nome não informado", m.usuario?.celular,
+        id: m.usuario.id));
     membros.clear();
-    membros.addAll(
-        grupoMembros.where((t) => t.celular != null && t.celular.isNotEmpty));
+    membros.addAll(grupoMembros.where((t) =>
+        t.celular != null &&
+        t.celular.isNotEmpty &&
+        t.id != applicationController.usuarioLogado.id));
     partida = grupo.partida;
     destino = grupo.destino;
+    usuarioEhAdministrador = grupo.membros.any((m) =>
+        m.administrador &&
+        m.usuario.id == applicationController.usuarioLogado.id);
   }
 
   @action
@@ -146,8 +155,7 @@ abstract class DetalhesGrupoBase with Store {
           ..hora = hora.hour
           ..minuto = hora.minute
           ..grupoId = grupoId
-          // ..usuarioId = applicationController.usuarioLogado.id;
-          ..usuarioId = 1;
+          ..usuarioId = applicationController.usuarioLogado.id;
 
         print("implementar usuarioId");
 
@@ -157,6 +165,14 @@ abstract class DetalhesGrupoBase with Store {
       }
     }
     return false;
+  }
+
+  @action
+  Future<bool> removerMembro(int usuarioId, int grupoId) async {
+    var removeu = await _repository.sairDoGrupo(grupoId, usuarioId);
+    if (removeu) await carregarGrupo(grupoId);
+
+    return removeu;
   }
 
   @computed

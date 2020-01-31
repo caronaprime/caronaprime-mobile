@@ -6,7 +6,6 @@ import 'package:carona_prime/app/models/membro_grupo_model.dart';
 import 'package:carona_prime/app/models/usuario_model.dart';
 import 'package:carona_prime/app/shared/repositories/grupo_repository.dart';
 import 'package:contacts_service/contacts_service.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_it/get_it.dart';

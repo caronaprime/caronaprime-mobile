@@ -40,6 +40,35 @@ class ListaGrupoPage extends StatelessWidget {
                     onTap: () => Navigator.of(context).push<bool>(
                         MaterialPageRoute(
                             builder: (context) => DetalhesGrupoPage(grupo.id))),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text(
+                                    "Tem certeza que deseja sair do do grupo ${grupo.nome}?"),
+                                actions: <Widget>[
+                                  FlatButton(
+                                    child: Text("Não"),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                  ),
+                                  FlatButton(
+                                    child: Text("Sim"),
+                                    onPressed: () async {
+                                      await controller.sairDoGrupo(grupo.id);
+                                      if (Navigator.of(context).canPop()) {
+                                        Navigator.of(context).pop();
+                                      }
+                                    },
+                                  )
+                                ],
+                              );
+                            });
+                      },
+                    ),
                     title: Text(grupo.nome),
                     subtitle:
                         Text("${grupo.partida.nome} - ${grupo.destino.nome}"),

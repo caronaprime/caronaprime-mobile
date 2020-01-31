@@ -20,10 +20,16 @@ abstract class LoginBase with Store {
   String codeNumber = "";
 
   @observable
+  String nome = "";
+
+  @observable
   String status = "";
 
   @observable
   String error;
+
+  @action
+  void setNome(String value) => nome = value;
 
   @action
   void setPhoneNumber(String value) => phoneNumber = value;
@@ -32,12 +38,11 @@ abstract class LoginBase with Store {
   enviarCodigo(String number) async => _repository.enviarCodigo(number);
 
   Future<bool> entrar(String smsCode) async {
-    var entrou = await _repository.entrar(smsCode);
+    var entrou = await _repository.entrar(smsCode, phoneNumber, nome);
     if (entrou)
       error = null;
     else
-      error =
-          "Código inválido.";
+      error = "Código inválido.";
 
     return entrou;
   }

@@ -8,7 +8,7 @@ class UsuarioModel {
   String nome;
   String celular;
 
-  UsuarioModel(this.nome, this.celular);
+  UsuarioModel(this.nome, this.celular, {this.id});
 
   factory UsuarioModel.fromJson(Map<String, dynamic> json) =>
       _$UsuarioModelFromJson(json);
