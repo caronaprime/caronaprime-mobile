@@ -1,10 +1,14 @@
 import 'package:carona_prime/app/application_controller.dart';
 import 'package:carona_prime/app/models/usuario_model.dart';
+import 'package:carona_prime/app/shared/default_url.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 
 class LoginRepository {
   var applicationController = GetIt.I.get<ApplicationController>();
+  var defaultUrl = GetIt.I.get<DefaultUrl>();
+  var dio = Dio();
   var _auth = FirebaseAuth.instance;
   String _verificationId;
 
@@ -26,23 +30,38 @@ class LoginRepository {
     }
   }
 
-  Future<bool> entrar(String smsCode) async {
+  Future<bool> entrar(String smsCode, String phoneNumber, String nome) async {
     try {
       AuthCredential credential = PhoneAuthProvider.getCredential(
           verificationId: _verificationId, smsCode: smsCode);
 
       AuthResult authResult = await _auth.signInWithCredential(credential);
       FirebaseUser user = authResult.user;
-      print('Usuário logado com sucesso $user');      
-      applicationController.logar(UsuarioModel(user.displayName, user.phoneNumber));
+      var usuarioModel =
+          await buscarOuCriarUsuario(nome, phoneNumber, user.uid);
+      print('Usuário logado com sucesso $user');
+      applicationController.logar(usuarioModel);
       return true;
-    } catch (e) {      
+    } catch (e) {
       return false;
     }
   }
 
+  Future<UsuarioModel> buscarOuCriarUsuario(
+      String nome, String phoneNumber, String userId) async {
+    try {
+      var json = {"nome": nome, "numero": phoneNumber, "userId": userId};
+      var response = await dio
+          .post(defaultUrl.url + "/usuarios/buscar-ou-criar", data: json);
+      var jsonResponse = response.data;
+      return UsuarioModel.fromJson(jsonResponse);
+    } catch (e) {
+      return null;
+    }
+  }
+
   _verificationCompleted(AuthCredential phoneAuthCredential) {
-    _auth.signInWithCredential(phoneAuthCredential);       
+    _auth.signInWithCredential(phoneAuthCredential);
   }
 
   _verificationFailed(AuthException authException) {

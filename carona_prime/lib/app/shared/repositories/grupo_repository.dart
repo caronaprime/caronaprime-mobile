@@ -6,12 +6,23 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
 class GrupoRepository {
-  var dioClient = GetIt.I.get<DefaultUrl>();  
+  var urlDefault = GetIt.I.get<DefaultUrl>();
   var dio = Dio();
 
-  Future<List<ListaGruposResponse>> getGrupos() async {
+  Future<bool> sairDoGrupo(int grupoId, int usuarioId) async {
     try {
-      var response = await dio.get(dioClient.url + "/grupos");
+      var response = await dio.post(urlDefault.url + '/grupos/sair',
+          data: {"grupoId": grupoId, "usuarioId": usuarioId});
+      return (response.statusCode >= 200 && response.statusCode < 300);      
+    } catch (e) {
+      return false; 
+    }
+  }
+
+  Future<List<ListaGruposResponse>> getGrupos(int usuarioId) async {
+    try {
+      var response =
+          await dio.get(urlDefault.url + "/usuarios/$usuarioId/grupos");
       var grupos = List<ListaGruposResponse>();
       for (var grupoJson in response.data) {
         var grupo = ListaGruposResponse.fromJson(grupoJson);
@@ -26,7 +37,7 @@ class GrupoRepository {
   Future<GrupoModel> getGrupo(int grupoId) async {
     if (grupoId > 0) {
       try {
-        var response = await dio.get(dioClient.url + "/grupos/$grupoId");
+        var response = await dio.get(urlDefault.url + "/grupos/$grupoId");
         var grupo = GrupoModel.fromJson(response.data);
         return grupo;
       } catch (e) {
@@ -39,7 +50,7 @@ class GrupoRepository {
   Future<int> postGrupo(GrupoModel grupo) async {
     try {
       var json = grupo.toJson();
-      var response = await dio.post(dioClient.url + "/grupos", data: json);
+      var response = await dio.post(urlDefault.url + "/grupos", data: json);
       return response.statusCode;
     } on DioError catch (e) {
       print(e.message);
@@ -49,10 +60,10 @@ class GrupoRepository {
 
   Future<int> compartilharCarona(OfertaCaronaModel carona) async {
     try {
-      var json = carona.toJson();      
+      var json = carona.toJson();
       var response = await dio
-          .post(dioClient.url + '/grupos/compartilhar-carona', data: json);
-      return response.statusCode;      
+          .post(urlDefault.url + '/grupos/compartilhar-carona', data: json);
+      return response.statusCode;
     } on DioError catch (e) {
       print(e.message);
       return e.response.statusCode;

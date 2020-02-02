@@ -1,5 +1,6 @@
 import 'package:carona_prime/app/models/usuario_model.dart';
 import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_controller.dart';
+import 'package:carona_prime/app/pages/grupo/selecionar_contatos/selecionar_contatos.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -16,35 +17,47 @@ class DetalhesGrupoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     controller.carregarGrupo(grupoId);
     return Scaffold(
-      appBar: AppBar(title: Text("Nome do Grupo")),
-      body: Observer(
-          builder: (_) => Container(
-                  child: <Widget>[
-                pageCaronasDisponiveis(context),
-                pageOferecerCarona(context),
-                pageMembros(controller.membros)
-              ].elementAt(controller.pageIndex))),
-      bottomNavigationBar: Observer(
-        builder: (_) => BottomNavigationBar(
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.departure_board),
-              title: Text('Caronas Disponíveis'),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.directions_car),
-              title: Text('Oferecer Carona'),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.group),
-              title: Text('Membros'),
-            ),
-          ],
-          onTap: controller.setPageIndex,
-          currentIndex: controller.pageIndex,
+        appBar: AppBar(title: Text("Nome do Grupo")),
+        body: Observer(
+            builder: (_) => Container(
+                    child: <Widget>[
+                  pageCaronasDisponiveis(context),
+                  pageOferecerCarona(context),
+                  pageMembros(context, controller.membros)
+                ].elementAt(controller.pageIndex))),
+        bottomNavigationBar: Observer(
+          builder: (_) => BottomNavigationBar(
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.departure_board),
+                title: Text('Caronas Disponíveis'),
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.directions_car),
+                title: Text('Oferecer Carona'),
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.group),
+                title: Text('Membros'),
+              ),
+            ],
+            onTap: controller.setPageIndex,
+            currentIndex: controller.pageIndex,
+          ),
         ),
-      ),
-    );
+        floatingActionButton: Observer(
+            builder: (_) => controller.pageIndex == 2 &&
+                    controller.usuarioEhAdministrador
+                ? FloatingActionButton(
+                    child: Icon(Icons.add),
+                    onPressed: () async {
+                      var retorno = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SelecionarContatoPage()));
+                    },
+                  )
+                : Container()));
   }
 
   pageCaronasDisponiveis(BuildContext context) {
@@ -271,7 +284,7 @@ class DetalhesGrupoPage extends StatelessWidget {
     );
   }
 
-  pageMembros(ObservableList<UsuarioModel> membros) {
+  pageMembros(BuildContext context, ObservableList<UsuarioModel> membros) {
     if (membros == null || membros.isEmpty)
       return Center(
         child: Container(
@@ -282,11 +295,44 @@ class DetalhesGrupoPage extends StatelessWidget {
     return ListView(
         children: membros
             .map((membro) => ListTile(
-                title: Text(membro.nome),
-                subtitle: Text(membro.celular),
-                leading: CircleAvatar(
-                  child: Text(membro.nome[0]),
-                )))
+                  title: Text(membro.nome),
+                  subtitle: Text(membro.celular),
+                  leading: CircleAvatar(
+                    child: Text(membro.nome[0]),
+                  ),
+                  trailing: !controller.usuarioEhAdministrador
+                      ? null
+                      : IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text(
+                                        "Tem certeza que deseja remover ${membro.nome} do grupo?"),
+                                    actions: <Widget>[
+                                      FlatButton(
+                                        child: Text("Não"),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(),
+                                      ),
+                                      FlatButton(
+                                        child: Text("Sim"),
+                                        onPressed: () async {
+                                          await controller.removerMembro(
+                                              membro.id, grupoId);
+                                          if (Navigator.of(context).canPop()) {
+                                            Navigator.of(context).pop();
+                                          }
+                                        },
+                                      )
+                                    ],
+                                  );
+                                });
+                          },
+                        ),
+                ))
             .toList());
   }
 
