@@ -1,3 +1,4 @@
+import 'package:carona_prime/app/models/carona_model.dart';
 import 'package:carona_prime/app/models/local_model.dart';
 import 'package:carona_prime/app/models/membro_grupo_model.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -16,6 +17,9 @@ class GrupoModel {
   @JsonKey(name: "LatLongs")
   List<LatLngModel> latLongs;
 
+  @JsonKey(name: "Caronas")
+  List<CaronaModel> caronas;
+
   @JsonKey(name: "partidaGrupo")
   LocalModel partida;
   @JsonKey(name: "destinoGrupo")
@@ -23,6 +27,7 @@ class GrupoModel {
 
   GrupoModel();
 
-  factory GrupoModel.fromJson(Map<String, dynamic> json) => _$GrupoModelFromJson(json);
+  factory GrupoModel.fromJson(Map<String, dynamic> json) =>
+      _$GrupoModelFromJson(json);
   Map<String, dynamic> toJson() => _$GrupoModelToJson(this);
 }

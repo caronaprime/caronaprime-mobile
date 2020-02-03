@@ -1,5 +1,7 @@
 import 'package:carona_prime/app/models/grupo_model.dart';
 import 'package:carona_prime/app/models/oferta_carona_model.dart';
+import 'package:carona_prime/app/models/usuario_model.dart';
+import 'package:carona_prime/app/models/membro_grupo_model.dart';
 import 'package:carona_prime/app/shared/default_url.dart';
 import 'package:carona_prime/app/shared/responses/lista_grupos_response.dart';
 import 'package:dio/dio.dart';
@@ -13,9 +15,25 @@ class GrupoRepository {
     try {
       var response = await dio.post(urlDefault.url + '/grupos/sair',
           data: {"grupoId": grupoId, "usuarioId": usuarioId});
-      return (response.statusCode >= 200 && response.statusCode < 300);      
+      return (response.statusCode >= 200 && response.statusCode < 300);
     } catch (e) {
-      return false; 
+      return false;
+    }
+  }
+
+  Future<bool> adicionarMembros(
+      List<UsuarioModel> usuarios, int grupoId) async {
+    try {
+      var json = {
+        "grupoId": grupoId,
+        "MembroGrupos":
+            usuarios.map((c) => MembroGrupoModel(c, false).toJson()).toList()
+      };
+      var response = await dio
+          .post(urlDefault.url + "/grupos/adicionar-membros", data: json);
+      return response.statusCode >= 200 && response.statusCode < 300;
+    } catch (e) {
+      return false;
     }
   }
 
@@ -38,8 +56,7 @@ class GrupoRepository {
     if (grupoId > 0) {
       try {
         var response = await dio.get(urlDefault.url + "/grupos/$grupoId");
-        var grupo = GrupoModel.fromJson(response.data);
-        return grupo;
+        return GrupoModel.fromJson(response.data);        
       } catch (e) {
         return null;
       }

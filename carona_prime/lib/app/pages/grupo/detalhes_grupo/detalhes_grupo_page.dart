@@ -1,6 +1,7 @@
 import 'package:carona_prime/app/models/usuario_model.dart';
 import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_controller.dart';
 import 'package:carona_prime/app/pages/grupo/selecionar_contatos/selecionar_contatos.dart';
+import 'package:contacts_service/contacts_service.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -12,11 +13,13 @@ class DetalhesGrupoPage extends StatelessWidget {
   final int grupoId;
   final controller = DetalhesGrupoController();
   final vagasDisponiveis = [1, 2, 3, 4, 5, 6];
+  final _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     controller.carregarGrupo(grupoId);
     return Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(title: Text("Nome do Grupo")),
         body: Observer(
             builder: (_) => Container(
@@ -46,18 +49,26 @@ class DetalhesGrupoPage extends StatelessWidget {
           ),
         ),
         floatingActionButton: Observer(
-            builder: (_) => controller.pageIndex == 2 &&
-                    controller.usuarioEhAdministrador
-                ? FloatingActionButton(
-                    child: Icon(Icons.add),
-                    onPressed: () async {
-                      var retorno = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SelecionarContatoPage()));
-                    },
-                  )
-                : Container()));
+            builder: (_) =>
+                controller.pageIndex == 2 && controller.usuarioEhAdministrador
+                    ? FloatingActionButton(
+                        child: Icon(Icons.add),
+                        onPressed: () async {
+                          var retorno = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SelecionarContatoPage(
+                                      true, controller.membros)));
+                          if (retorno is List<Contact>) {
+                            var usuarios = retorno
+                                .map((c) => UsuarioModel(
+                                    c.displayName, c.phones.first.value))
+                                .toList();
+                            controller.adicionarContatos(usuarios, grupoId);
+                          }
+                        },
+                      )
+                    : Container()));
   }
 
   pageCaronasDisponiveis(BuildContext context) {
@@ -73,59 +84,63 @@ class DetalhesGrupoPage extends StatelessWidget {
                       : "Origem e Destino não informados",
                   style: Theme.of(context).textTheme.title)),
         ),
-        Expanded(
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: 15,
-            itemBuilder: (_, index) => Container(
-              height: 200,
-              child: Card(
-                elevation: 2,
-                child: Center(
-                    child: Column(
-                  children: <Widget>[
-                    Expanded(
-                        child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        Text("Convite de Patrícia",
-                            style: Theme.of(context).textTheme.title),
-                        Text(
-                          "Vagas Disponíveis: 4",
-                          style: TextStyle(
-                              color: Theme.of(context).accentColor,
-                              fontSize: 18),
-                        ),
-                        Text(
-                          "Saindo às 09:00h",
-                          style: TextStyle(
-                              color: Theme.of(context).accentColor,
-                              fontSize: 18),
-                        ),
-                      ],
-                    )),
-                    Center(
-                      child: Row(
+        Observer(
+          builder: (_) => Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: controller.caronas.length,
+              itemBuilder: (_, index) => Container(                
+                height: 200,
+                child: Card(
+                  elevation: 2,
+                  child: Center(
+                      child: Column(
+                    children: <Widget>[
+                      Expanded(
+                          child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          FlatButton(
-                            child: Text(
-                              "RECUSAR",
-                              style: TextStyle(
-                                  color:
-                                      Theme.of(context).textTheme.body1.color),
-                            ),
-                            onPressed: () => print("recusar"),
+                          Text("Convite de ${controller.caronas[index].motorista.nome}",
+                              style: Theme.of(context).textTheme.title),
+                          Text(
+                            "Vagas Disponíveis: ${controller.caronas[index].totalVagas}",
+                            style: TextStyle(
+                                color: Theme.of(context).accentColor,
+                                fontSize: 18),
                           ),
-                          FlatButton(
-                            child: Text("QUERO CARONA!"),
-                            onPressed: () => print("Quero carona"),
-                          )
+                          Text(
+                            "Saindo às ${controller.caronas[index].hora}:${controller.caronas[index].minuto}h",
+                            style: TextStyle(
+                                color: Theme.of(context).accentColor,
+                                fontSize: 18),
+                          ),
                         ],
-                      ),
-                    )
-                  ],
-                )),
+                      )),
+                      Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            FlatButton(
+                              child: Text(
+                                "RECUSAR",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .body1
+                                        .color),
+                              ),
+                              onPressed: () => print("recusar"),
+                            ),
+                            FlatButton(
+                              child: Text("QUERO CARONA!"),
+                              onPressed: () => print("Quero carona"),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  )),
+                ),
               ),
             ),
           ),
@@ -274,7 +289,13 @@ class DetalhesGrupoPage extends StatelessWidget {
                   child: controller.compartilhando
                       ? CircularProgressIndicator(backgroundColor: Colors.white)
                       : Text("Compartilhar Carona"),
-                  onPressed: () => controller.compartilharCarona(grupoId),
+                  onPressed: () async {
+                    var sucesso = await controller.compartilharCarona(grupoId);
+                    if (sucesso)
+                      _scaffoldKey.currentState.showSnackBar(SnackBar(
+                        content: Text("Oferta de carona criada com sucesso"),
+                      ));
+                  },
                 ),
               )
             ],

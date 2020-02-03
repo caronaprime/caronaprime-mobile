@@ -1,4 +1,5 @@
 import 'package:carona_prime/app/application_controller.dart';
+import 'package:carona_prime/app/models/carona_model.dart';
 import 'package:carona_prime/app/models/local_model.dart';
 import 'package:carona_prime/app/models/oferta_carona_model.dart';
 import 'package:carona_prime/app/models/usuario_model.dart';
@@ -70,6 +71,9 @@ abstract class DetalhesGrupoBase with Store {
   @observable
   ObservableList<UsuarioModel> membros = ObservableList<UsuarioModel>();
 
+  @observable
+  ObservableList<CaronaModel> caronas = ObservableList<CaronaModel>();
+
   @action
   void setPortaMalasLivre(bool value) => portaMalasLivre = value;
 
@@ -110,6 +114,18 @@ abstract class DetalhesGrupoBase with Store {
   void setHora(TimeOfDay value) => hora = value;
 
   @action
+  Future<bool> adicionarContatos(
+      List<UsuarioModel> contatos, int grupoId) async {
+    if (contatos.length > 0) {
+      var retorno = await _repository.adicionarMembros(contatos, grupoId);
+      if (retorno) carregarGrupo(grupoId);
+
+      return retorno;
+    }
+    return false;
+  }
+
+  @action
   Future carregarGrupo(int grupoId) async {
     var grupo = await _repository.getGrupo(grupoId);
     var grupoMembros = grupo.membros.map((m) => UsuarioModel(
@@ -120,6 +136,8 @@ abstract class DetalhesGrupoBase with Store {
         t.celular != null &&
         t.celular.isNotEmpty &&
         t.id != applicationController.usuarioLogado.id));
+    caronas.clear();
+    caronas.addAll(grupo.caronas);
     partida = grupo.partida;
     destino = grupo.destino;
     usuarioEhAdministrador = grupo.membros.any((m) =>
@@ -156,8 +174,6 @@ abstract class DetalhesGrupoBase with Store {
           ..minuto = hora.minute
           ..grupoId = grupoId
           ..usuarioId = applicationController.usuarioLogado.id;
-
-        print("implementar usuarioId");
 
         var statusCode = await _repository.compartilharCarona(carona);
         compartilhando = false;
