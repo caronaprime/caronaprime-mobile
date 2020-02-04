@@ -1,6 +1,7 @@
 import 'package:carona_prime/app/models/usuario_model.dart';
 import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_controller.dart';
 import 'package:carona_prime/app/pages/grupo/selecionar_contatos/selecionar_contatos.dart';
+import 'package:carona_prime/app/shared/widgets/minhas_caronas_widget.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
@@ -11,23 +12,29 @@ import 'package:mobx/mobx.dart';
 class DetalhesGrupoPage extends StatelessWidget {
   DetalhesGrupoPage(this.grupoId);
   final int grupoId;
-  final controller = DetalhesGrupoController();
-  final vagasDisponiveis = [1, 2, 3, 4, 5, 6];
-  final _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final _controller = DetalhesGrupoController();
+  final _vagasDisponiveis = [1, 2, 3, 4, 5, 6];
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
-    controller.carregarGrupo(grupoId);
+    _controller.carregarGrupo(grupoId);
     return Scaffold(
         key: _scaffoldKey,
-        appBar: AppBar(title: Text("Nome do Grupo")),
+        appBar: AppBar(
+            title: Observer(builder: (_) => Text(_controller.nomeDoGrupo))),
         body: Observer(
             builder: (_) => Container(
                     child: <Widget>[
                   pageCaronasDisponiveis(context),
-                  pageOferecerCarona(context),
-                  pageMembros(context, controller.membros)
-                ].elementAt(controller.pageIndex))),
+                  MinhasCaronasWidget(
+                    scaffoldKey: _scaffoldKey,
+                    caronas: _controller.caronas,
+                    oferecerCaronasAoGrupoId: grupoId,
+                    onDesistirDaCarona: (caronaId) => print(caronaId),
+                  ),
+                  pageMembros(context, _controller.membros)
+                ].elementAt(_controller.pageIndex))),
         bottomNavigationBar: Observer(
           builder: (_) => BottomNavigationBar(
             items: <BottomNavigationBarItem>[
@@ -37,20 +44,20 @@ class DetalhesGrupoPage extends StatelessWidget {
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.directions_car),
-                title: Text('Oferecer Carona'),
+                title: Text('Minhas Caronas'),
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.group),
                 title: Text('Membros'),
               ),
             ],
-            onTap: controller.setPageIndex,
-            currentIndex: controller.pageIndex,
+            onTap: _controller.setPageIndex,
+            currentIndex: _controller.pageIndex,
           ),
         ),
         floatingActionButton: Observer(
             builder: (_) =>
-                controller.pageIndex == 2 && controller.usuarioEhAdministrador
+                _controller.pageIndex == 2 && _controller.usuarioEhAdministrador
                     ? FloatingActionButton(
                         child: Icon(Icons.add),
                         onPressed: () async {
@@ -58,13 +65,13 @@ class DetalhesGrupoPage extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => SelecionarContatoPage(
-                                      true, controller.membros)));
+                                      true, _controller.membros)));
                           if (retorno is List<Contact>) {
                             var usuarios = retorno
                                 .map((c) => UsuarioModel(
                                     c.displayName, c.phones.first.value))
                                 .toList();
-                            controller.adicionarContatos(usuarios, grupoId);
+                            _controller.adicionarContatos(usuarios, grupoId);
                           }
                         },
                       )
@@ -78,9 +85,9 @@ class DetalhesGrupoPage extends StatelessWidget {
           height: 60,
           child: Center(
               child: Text(
-                  controller.partida?.nome != null &&
-                          controller.destino?.nome != null
-                      ? "Origem: ${controller.partida?.nome} - Destino: ${controller.destino?.nome}"
+                  _controller.partida?.nome != null &&
+                          _controller.destino?.nome != null
+                      ? "Origem: ${_controller.partida?.nome} - Destino: ${_controller.destino?.nome}"
                       : "Origem e Destino não informados",
                   style: Theme.of(context).textTheme.title)),
         ),
@@ -88,8 +95,8 @@ class DetalhesGrupoPage extends StatelessWidget {
           builder: (_) => Expanded(
             child: ListView.builder(
               shrinkWrap: true,
-              itemCount: controller.caronas.length,
-              itemBuilder: (_, index) => Container(                
+              itemCount: _controller.caronas.length,
+              itemBuilder: (_, index) => Container(
                 height: 200,
                 child: Card(
                   elevation: 2,
@@ -100,16 +107,17 @@ class DetalhesGrupoPage extends StatelessWidget {
                           child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          Text("Convite de ${controller.caronas[index].motorista.nome}",
+                          Text(
+                              "Convite de ${_controller.caronas[index].motorista.nome}",
                               style: Theme.of(context).textTheme.title),
                           Text(
-                            "Vagas Disponíveis: ${controller.caronas[index].totalVagas}",
+                            "Vagas Disponíveis: ${_controller.caronas[index].totalVagas}",
                             style: TextStyle(
                                 color: Theme.of(context).accentColor,
                                 fontSize: 18),
                           ),
                           Text(
-                            "Saindo às ${controller.caronas[index].hora}:${controller.caronas[index].minuto}h",
+                            "Saindo às ${_controller.caronas[index].hora}:${_controller.caronas[index].minuto}h",
                             style: TextStyle(
                                 color: Theme.of(context).accentColor,
                                 fontSize: 18),
@@ -156,9 +164,9 @@ class DetalhesGrupoPage extends StatelessWidget {
           height: 60,
           child: Center(
               child: Text(
-                  controller.partida?.nome != null &&
-                          controller.destino?.nome != null
-                      ? "Origem: ${controller.partida?.nome} - Destino: ${controller.destino?.nome}"
+                  _controller.partida?.nome != null &&
+                          _controller.destino?.nome != null
+                      ? "Origem: ${_controller.partida?.nome} - Destino: ${_controller.destino?.nome}"
                       : "Origem e Destino não informados",
                   style: Theme.of(context).textTheme.title)),
         ),
@@ -173,19 +181,19 @@ class DetalhesGrupoPage extends StatelessWidget {
                   Observer(
                     builder: (_) => opcaoAdicionalButton(
                         "Carro Adaptado", context,
-                        checked: controller.carroAdaptado,
+                        checked: _controller.carroAdaptado,
                         iconData: Icons.accessible,
-                        onTap: () => controller
-                            .setCarroAdaptado(!controller.carroAdaptado)),
+                        onTap: () => _controller
+                            .setCarroAdaptado(!_controller.carroAdaptado)),
                   ),
                   Observer(
                       builder: (_) => opcaoAdicionalButton(
                             "Porta-malas livre",
                             context,
-                            checked: controller.portaMalasLivre,
+                            checked: _controller.portaMalasLivre,
                             iconData: Icons.shopping_cart,
-                            onTap: () => controller.setPortaMalasLivre(
-                                !controller.portaMalasLivre),
+                            onTap: () => _controller.setPortaMalasLivre(
+                                !_controller.portaMalasLivre),
                           ))
                 ],
               )),
@@ -195,9 +203,9 @@ class DetalhesGrupoPage extends StatelessWidget {
                       style: TextStyle(color: Theme.of(context).accentColor)),
                   Observer(
                       builder: (_) => DropdownButton(
-                            value: controller.vagasDisponiveis,
-                            onChanged: (i) => controller.setVagasDisponiveis,
-                            items: vagasDisponiveis
+                            value: _controller.vagasDisponiveis,
+                            onChanged: (i) => _controller.setVagasDisponiveis,
+                            items: _vagasDisponiveis
                                 .map((n) => DropdownMenuItem(
                                     child: Text(n.toString()), value: n))
                                 .toList(),
@@ -217,9 +225,9 @@ class DetalhesGrupoPage extends StatelessWidget {
                     format: DateFormat("HH:mm"),
                     onChanged: (value) {
                       if (value == null) {
-                        controller.setHora(null);
+                        _controller.setHora(null);
                       } else {
-                        controller.setHora(
+                        _controller.setHora(
                             TimeOfDay(hour: value.hour, minute: value.minute));
                       }
                     },
@@ -227,7 +235,7 @@ class DetalhesGrupoPage extends StatelessWidget {
                       TimeOfDay time = await showTimePicker(
                         context: context,
                         initialTime:
-                            controller.hora ?? TimeOfDay(hour: 00, minute: 00),
+                            _controller.hora ?? TimeOfDay(hour: 00, minute: 00),
                         builder: (BuildContext context, Widget child) {
                           return MediaQuery(
                             data: MediaQuery.of(context)
@@ -246,31 +254,32 @@ class DetalhesGrupoPage extends StatelessWidget {
                   children: <Widget>[
                     Text("Dias"),
                     Observer(
-                        builder: (_) =>
-                            controller.domingo ? Text("Domingo") : Container()),
+                        builder: (_) => _controller.domingo
+                            ? Text("Domingo")
+                            : Container()),
                     Observer(
-                        builder: (_) => controller.segunda
+                        builder: (_) => _controller.segunda
                             ? Text("Segunda-feira")
                             : Container()),
                     Observer(
-                        builder: (_) => controller.terca
+                        builder: (_) => _controller.terca
                             ? Text("Terça-feira")
                             : Container()),
                     Observer(
-                        builder: (_) => controller.quarta
+                        builder: (_) => _controller.quarta
                             ? Text("Quarta-feira")
                             : Container()),
                     Observer(
-                        builder: (_) => controller.quinta
+                        builder: (_) => _controller.quinta
                             ? Text("Quinta-feira")
                             : Container()),
                     Observer(
-                        builder: (_) => controller.sexta
+                        builder: (_) => _controller.sexta
                             ? Text("Sexta-feira")
                             : Container()),
                     Observer(
                         builder: (_) =>
-                            controller.sabado ? Text("Sábado") : Container()),
+                            _controller.sabado ? Text("Sábado") : Container()),
                   ],
                 ),
               ),
@@ -284,13 +293,13 @@ class DetalhesGrupoPage extends StatelessWidget {
             children: <Widget>[
               AnimatedContainer(
                 duration: Duration(milliseconds: 500),
-                width: controller.compartilhando ? 90 : 200,
+                width: _controller.compartilhando ? 90 : 200,
                 child: RaisedButton(
-                  child: controller.compartilhando
+                  child: _controller.compartilhando
                       ? CircularProgressIndicator(backgroundColor: Colors.white)
                       : Text("Compartilhar Carona"),
                   onPressed: () async {
-                    var sucesso = await controller.compartilharCarona(grupoId);
+                    var sucesso = await _controller.compartilharCarona(grupoId);
                     if (sucesso)
                       _scaffoldKey.currentState.showSnackBar(SnackBar(
                         content: Text("Oferta de carona criada com sucesso"),
@@ -321,7 +330,7 @@ class DetalhesGrupoPage extends StatelessWidget {
                   leading: CircleAvatar(
                     child: Text(membro.nome[0]),
                   ),
-                  trailing: !controller.usuarioEhAdministrador
+                  trailing: !_controller.usuarioEhAdministrador
                       ? null
                       : IconButton(
                           icon: Icon(Icons.delete),
@@ -341,7 +350,7 @@ class DetalhesGrupoPage extends StatelessWidget {
                                       FlatButton(
                                         child: Text("Sim"),
                                         onPressed: () async {
-                                          await controller.removerMembro(
+                                          await _controller.removerMembro(
                                               membro.id, grupoId);
                                           if (Navigator.of(context).canPop()) {
                                             Navigator.of(context).pop();
@@ -378,52 +387,52 @@ class DetalhesGrupoPage extends StatelessWidget {
                   Observer(
                     builder: (_) => checkBoxLabel(
                         label: "Repetir Semanalmente",
-                        value: controller.repetirSemanalmente,
-                        onChanged: (_) => controller.setRepetirSemanalmente(
-                            !controller.repetirSemanalmente)),
+                        value: _controller.repetirSemanalmente,
+                        onChanged: (_) => _controller.setRepetirSemanalmente(
+                            !_controller.repetirSemanalmente)),
                   ),
                   Observer(
                       builder: (_) => checkBoxLabel(
                           label: "Domingo",
-                          value: controller.domingo,
+                          value: _controller.domingo,
                           onChanged: (_) =>
-                              controller.setDomingo(!controller.domingo))),
+                              _controller.setDomingo(!_controller.domingo))),
                   Observer(
                       builder: (_) => checkBoxLabel(
                           label: "Segunda-Feira",
-                          value: controller.segunda,
+                          value: _controller.segunda,
                           onChanged: (_) =>
-                              controller.setSegunda(!controller.segunda))),
+                              _controller.setSegunda(!_controller.segunda))),
                   Observer(
                       builder: (_) => checkBoxLabel(
                           label: "Terça-Feira",
-                          value: controller.terca,
+                          value: _controller.terca,
                           onChanged: (_) =>
-                              controller.setTerca(!controller.terca))),
+                              _controller.setTerca(!_controller.terca))),
                   Observer(
                       builder: (_) => checkBoxLabel(
                           label: "Quarta-Feira",
-                          value: controller.quarta,
+                          value: _controller.quarta,
                           onChanged: (_) =>
-                              controller.setQuarta(!controller.quarta))),
+                              _controller.setQuarta(!_controller.quarta))),
                   Observer(
                       builder: (_) => checkBoxLabel(
                           label: "Quinta-Feira",
-                          value: controller.quinta,
+                          value: _controller.quinta,
                           onChanged: (_) =>
-                              controller.setQuinta(!controller.quinta))),
+                              _controller.setQuinta(!_controller.quinta))),
                   Observer(
                       builder: (_) => checkBoxLabel(
                           label: "Sexta-Feira",
-                          value: controller.sexta,
+                          value: _controller.sexta,
                           onChanged: (_) =>
-                              controller.setSexta(!controller.sexta))),
+                              _controller.setSexta(!_controller.sexta))),
                   Observer(
                       builder: (_) => checkBoxLabel(
                           label: "Sábado",
-                          value: controller.sabado,
+                          value: _controller.sabado,
                           onChanged: (_) =>
-                              controller.setSabado(!controller.sabado))),
+                              _controller.setSabado(!_controller.sabado))),
                 ],
               ),
             ),

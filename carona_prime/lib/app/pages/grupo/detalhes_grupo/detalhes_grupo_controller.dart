@@ -18,6 +18,9 @@ abstract class DetalhesGrupoBase with Store {
   var applicationController = GetIt.I.get<ApplicationController>();
 
   @observable
+  String nomeDoGrupo = "";
+
+  @observable
   bool usuarioEhAdministrador = false;
 
   @observable
@@ -128,6 +131,7 @@ abstract class DetalhesGrupoBase with Store {
   @action
   Future carregarGrupo(int grupoId) async {
     var grupo = await _repository.getGrupo(grupoId);
+    nomeDoGrupo = grupo.nome;
     var grupoMembros = grupo.membros.map((m) => UsuarioModel(
         m.usuario?.nome ?? "Nome não informado", m.usuario?.celular,
         id: m.usuario.id));
@@ -143,6 +147,12 @@ abstract class DetalhesGrupoBase with Store {
     usuarioEhAdministrador = grupo.membros.any((m) =>
         m.administrador &&
         m.usuario.id == applicationController.usuarioLogado.id);
+  }
+
+  @action
+  Future<bool> desistirDaCarona(int caronaId) async {    
+    print("implementar");
+    return true;
   }
 
   @action
