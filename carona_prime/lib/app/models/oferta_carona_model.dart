@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'oferta_carona_model.g.dart';
@@ -18,6 +17,7 @@ class OfertaCaronaModel {
   bool quinta;
   bool sexta;
   bool sabado;
+  bool repertirSemanalmente;
   int usuarioId;
 
   OfertaCaronaModel();
