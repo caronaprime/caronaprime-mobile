@@ -1,7 +1,6 @@
 import 'package:carona_prime/app/pages/grupo/detalhes_grupo/detalhes_grupo_page.dart';
 import 'package:carona_prime/app/pages/grupo/lista_grupo/lista_grupo_controller.dart';
 import 'package:carona_prime/app/pages/grupo/novo_grupo/novo_grupo_page.dart';
-import 'package:carona_prime/app/pages/notificacoes/notificacoes_page.dart';
 import 'package:carona_prime/app/shared/widgets/default_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -16,13 +15,13 @@ class ListaGrupoPage extends StatelessWidget {
       drawer: DefaultDrawer(),
       appBar: AppBar(
         title: Text("Grupos"),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => NotificacoesPage())),
-          )
-        ],
+        // actions: <Widget>[
+        //   IconButton(
+        //     icon: Icon(Icons.notifications),
+        //     onPressed: () => Navigator.of(context).push(
+        //         MaterialPageRoute(builder: (context) => NotificacoesPage())),
+        //   )
+        // ],
       ),
       body: Observer(builder: (_) {
         if (controller.gruposResponse == null ||

@@ -105,42 +105,66 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                         ),
                       ),
                       Expanded(
-                        child: ListView(
-                          children: controller.contatosFiltrados.map((contact) {
-                            var avatar = CircleAvatar(
-                              child: contact.avatar.isEmpty
-                                  ? Text(contact.displayName[0])
-                                  : Image.memory(contact.avatar),
-                            );
-                            return ListTile(
-                                title: Text(contact.displayName),
-                                subtitle: Text(contact.phones.first.value),
-                                trailing: Checkbox(
-                                  value:
-                                      controller.contatosSelecionados != null &&
-                                          controller.contatosSelecionados
-                                                  .indexOf(contact) >=
-                                              0,
-                                  onChanged: (value) {
-                                    if (value) {
-                                      controller
-                                          .adicionarContatoSelecionado(contact);
-                                    } else {
-                                      controller
-                                          .removerContatoSelecionado(contact);
-                                    }
-                                  },
-                                ),
-                                leading: avatar);
-                          }).toList(),
-                        ),
-                      )
+                          child: controller?.contatosFiltrados == null ||
+                                  controller.contatosFiltrados.isEmpty
+                              ? Container()
+                              : ListView.builder(
+                                  itemCount:
+                                      controller.contatosFiltrados.length,
+                                  itemBuilder: (_, index) {
+                                    var contact =
+                                        controller.contatosFiltrados[index];
+                                    var avatar = CircleAvatar(
+                                        child: conteudoAvatar(contact));
+
+                                    String numero = "";
+                                    if (contact.phones == null ||
+                                        contact.phones.isEmpty)
+                                      numero = "sem número";
+                                    else
+                                      numero = contact.phones.first.value;
+
+                                    return ListTile(
+                                        title: Text(
+                                            contact.displayName ?? "Sem nome"),
+                                        subtitle: Text(numero),
+                                        trailing: Checkbox(
+                                          value: controller
+                                                      .contatosSelecionados !=
+                                                  null &&
+                                              controller.contatosSelecionados
+                                                      .indexOf(contact) >=
+                                                  0,
+                                          onChanged: (value) {
+                                            if (value) {
+                                              controller
+                                                  .adicionarContatoSelecionado(
+                                                      contact);
+                                            } else {
+                                              controller
+                                                  .removerContatoSelecionado(
+                                                      contact);
+                                            }
+                                          },
+                                        ),
+                                        leading: avatar);
+                                  }))
                     ],
                   ),
                 ),
         );
       },
     );
+  }
+
+  conteudoAvatar(Contact contact) {
+    if (contact?.avatar != null && contact.avatar.isNotEmpty)
+      return Image.memory(contact.avatar);
+
+    if (contact?.displayName != null && contact.displayName.isNotEmpty)
+      Text(contact.displayName[0]);
+
+    return Text("A");
   }
 
   inputsLocalizacao() {
@@ -267,14 +291,15 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   }
 
   ListTile listTileContact(Contact contact) {
-    var avatar = CircleAvatar(
-      child: contact.avatar.isEmpty
-          ? Text(contact.displayName[0])
-          : Image.memory(contact.avatar),
-    );
+    var avatar = CircleAvatar(child: conteudoAvatar(contact));
+    String numero = "";
+    if (contact.phones == null || contact.phones.isEmpty)
+      numero = "sem número";
+    else
+      numero = contact.phones.first.value;
     return ListTile(
-        title: Text(contact.displayName),
-        subtitle: Text(contact.phones.first.value),
+        title: Text(contact?.displayName ?? "Sem nome"),
+        subtitle: Text(numero),
         leading: avatar);
   }
 
