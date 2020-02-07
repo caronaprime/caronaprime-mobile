@@ -1,13 +1,20 @@
+import 'package:carona_prime/app/application_controller.dart';
 import 'package:carona_prime/app/models/usuario_model.dart';
 import 'package:carona_prime/app/pages/grupo/selecionar_contatos/selecionar_contatos_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
 import 'package:mobx/mobx.dart';
 
 class SelecionarContatoPage extends StatefulWidget {
   final bool mostrarBotaoConcluir;
   final ObservableList<UsuarioModel> membros;
-  const SelecionarContatoPage(this.mostrarBotaoConcluir, this.membros);
+  final bool paginaCompleta;
+
+  const SelecionarContatoPage(
+      {@required this.mostrarBotaoConcluir,
+      @required this.membros,
+      @required this.paginaCompleta});
 
   @override
   _SelecionarContatoPageState createState() => _SelecionarContatoPageState();
@@ -15,7 +22,7 @@ class SelecionarContatoPage extends StatefulWidget {
 
 class _SelecionarContatoPageState extends State<SelecionarContatoPage> {
   final controller = SelecionarContatosController();
-
+  final applicationController = GetIt.I.get<ApplicationController>();
   final buscarContatosTextController = TextEditingController();
 
   @override
@@ -24,27 +31,23 @@ class _SelecionarContatoPageState extends State<SelecionarContatoPage> {
     controller.loadContacts();
   }
 
-  bool isNumber(String text) => '0123456789'.split('').contains(text);
-
-  String onlyNumbers(String text) =>
-      text.split('').where((c) => isNumber(c)).join('');
-
-  String phoneNumber(String text) {
-    if (text == null) return null;
-
-    var number = onlyNumbers(text);
-    if (number.length <= 11) return number;
-
-    return number.substring(number.length - 11);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Adicionar contatos"),
-      ),
-      body: Center(child: Observer(
+    if (widget.paginaCompleta) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Selecionar Contatos"),
+        ),
+        body: body(),
+      );
+    }
+
+    return body();
+  }
+
+  Widget body() {
+    return Center(
+      child: Observer(
         builder: (_) {
           if (!controller.carregouContato)
             return Center(child: CircularProgressIndicator());
@@ -78,9 +81,15 @@ class _SelecionarContatoPageState extends State<SelecionarContatoPage> {
                                       ? Text(contact.displayName[0])
                                       : Image.memory(contact.avatar),
                                 );
+                                String numero = "";
+                                if (contact.phones == null ||
+                                    contact.phones.isEmpty)
+                                  numero = "sem número";
+                                else
+                                  numero = contact.phones.first.value;
                                 return ListTile(
                                     title: Text(contact.displayName),
-                                    subtitle: Text(contact.phones.first.value),
+                                    subtitle: Text(numero),
                                     trailing: Checkbox(
                                       value: controller.contatosSelecionados !=
                                               null &&
@@ -114,13 +123,27 @@ class _SelecionarContatoPageState extends State<SelecionarContatoPage> {
                                 child: RaisedButton(
                                   child: Text("Concluir"),
                                   onPressed: () {
-                                    var numerosJaNoGrupo = widget.membros
-                                        .map((m) => phoneNumber(m.celular))
-                                        .toList();
+                                    List<String> numerosJaNoGrupo =
+                                        List<String>();
+                                    if (widget.membros != null) {
+                                      numerosJaNoGrupo = widget.membros
+                                          .map((m) => applicationController
+                                              .phoneNumber(m.celular))
+                                          .toList();
+                                    }
                                     var novosContatos = controller
                                         .contatosSelecionados
-                                        .where((c) => !numerosJaNoGrupo.contains(
-                                            phoneNumber(c.phones.first.value))).toList();
+                                        .where((c) {
+                                      String numero = "";
+                                      if (c.phones == null || c.phones.isEmpty)
+                                        numero = "sem número";
+                                      else
+                                        numero = c.phones.first.value;
+
+                                      return !numerosJaNoGrupo.contains(
+                                          applicationController
+                                              .phoneNumber(numero));
+                                    }).toList();
 
                                     Navigator.of(context).pop(novosContatos);
                                   },
@@ -132,7 +155,7 @@ class _SelecionarContatoPageState extends State<SelecionarContatoPage> {
                   ),
           );
         },
-      )),
+      ),
     );
   }
 }

@@ -44,16 +44,6 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  code() {
-    return Observer(
-        builder: (_) => Container(
-              child: Text("rever"),
-              // child: snapshot.hasData
-              //     ? Text(snapshot.data)
-              //     : CircularProgressIndicator(),
-            ));
-  }
-
   FlatButton labelInformativo() {
     return FlatButton(
       child: Text('Para que servem esses dados?',
@@ -123,19 +113,17 @@ class LoginPage extends StatelessWidget {
   phoneTextField(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(8.0),
-      child: Observer(
-        builder: (_) => TextFormField(
-            focusNode: _phoneFocus,
-            onChanged: (value) => controller.setPhoneNumber(value),
-            controller: phoneTextController,
-            keyboardType: TextInputType.phone,
-            autofocus: false,
-            decoration: InputDecoration(
-              labelText: "Celular",
-              hintText: 'Ex: (99) 9 9999 9999 ',
-            ),
-            onFieldSubmitted: (term) => enviarCodigo(context)),
-      ),
+      child: TextFormField(
+          focusNode: _phoneFocus,
+          onChanged: (value) => controller.setPhoneNumber(value),
+          controller: phoneTextController,
+          keyboardType: TextInputType.phone,
+          autofocus: false,
+          decoration: InputDecoration(
+            labelText: "Celular",
+            hintText: 'Ex: (99) 9 9999 9999 ',
+          ),
+          onFieldSubmitted: (term) => enviarCodigo(context)),
     );
   }
 

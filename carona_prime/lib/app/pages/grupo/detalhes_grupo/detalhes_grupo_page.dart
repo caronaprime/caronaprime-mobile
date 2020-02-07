@@ -67,12 +67,20 @@ class DetalhesGrupoPage extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => SelecionarContatoPage(
-                                      true, _controller.membros)));
+                                        mostrarBotaoConcluir: true,
+                                        membros: _controller.membros,
+                                        paginaCompleta: true,
+                                      )));
                           if (retorno is List<Contact>) {
-                            var usuarios = retorno
-                                .map((c) => UsuarioModel(
-                                    c.displayName, c.phones.first.value))
-                                .toList();
+                            var usuarios = retorno.map((c) {
+                              String numero = "";
+                              if (c.phones == null || c.phones.isEmpty)
+                                numero = "sem número";
+                              else
+                                numero = c.phones.first.value;
+
+                              return UsuarioModel(c.displayName, numero);
+                            }).toList();
                             _controller.adicionarContatos(usuarios, grupoId);
                           }
                         },

@@ -108,7 +108,7 @@ abstract class NovoGrupoBase with Store {
 
         return MembroGrupoModel(
             UsuarioModel(c.displayName ?? "Sem nome", numero), false);
-      }).toList();      
+      }).toList();
 
       membros.add(MembroGrupoModel(applicationController.usuarioLogado, true));
 
@@ -188,6 +188,15 @@ abstract class NovoGrupoBase with Store {
 
     for (var point in points) {
       polyLinePoints.add(LatLng(point.latitude, point.longitude));
+    }
+  }
+
+  @action
+  void adicionarOuRemoverContato(bool value, Contact contact) {
+    if (value) {
+      adicionarContatoSelecionado(contact);
+    } else {
+      removerContatoSelecionado(contact);
     }
   }
 
