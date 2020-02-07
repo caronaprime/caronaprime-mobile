@@ -1,3 +1,4 @@
+import 'package:carona_prime/app/models/carona_model.dart';
 import 'package:carona_prime/app/models/grupo_model.dart';
 import 'package:carona_prime/app/models/oferta_carona_model.dart';
 import 'package:carona_prime/app/models/usuario_model.dart';
@@ -15,6 +16,37 @@ class GrupoRepository {
     try {
       var response = await dio.post(urlDefault.url + '/grupos/sair',
           data: {"grupoId": grupoId, "usuarioId": usuarioId});
+      return (response.statusCode >= 200 && response.statusCode < 300);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<OfertaCaronaModel> carregarOfertaCarona(
+      int grupoId, int usuarioId) async {
+    try {
+      var response =
+          await dio.get(urlDefault.url + "/grupos/$grupoId/oferta/$usuarioId");
+      return OfertaCaronaModel.fromJson(response.data);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<bool> recusarCarona(int usuarioId, int caronaId) async {
+    try {
+      var response = await dio.post(urlDefault.url + '/usuarios/recusar-carona',
+          data: {"caronaId": caronaId, "usuarioId": usuarioId});
+      return (response.statusCode >= 200 && response.statusCode < 300);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> aceitarCarona(int usuarioId, int caronaId) async {
+    try {
+      var response = await dio.post(urlDefault.url + '/usuarios/aceitar-carona',
+          data: {"caronaId": caronaId, "usuarioId": usuarioId});
       return (response.statusCode >= 200 && response.statusCode < 300);
     } catch (e) {
       return false;
@@ -56,7 +88,25 @@ class GrupoRepository {
     if (grupoId > 0) {
       try {
         var response = await dio.get(urlDefault.url + "/grupos/$grupoId");
-        return GrupoModel.fromJson(response.data);        
+        return GrupoModel.fromJson(response.data);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  Future<List<CaronaModel>> getProximasViagens(
+      int usuarioId, int grupoId) async {
+    if (grupoId > 0) {
+      try {
+        var response = await dio.get(
+            urlDefault.url + "/usuarios/$usuarioId/proximas-viagens/$grupoId");
+        var proximas = List<CaronaModel>();
+        for (var caronaJson in response.data) {
+          proximas.add(CaronaModel.fromJson(caronaJson));
+        }
+        return proximas;
       } catch (e) {
         return null;
       }

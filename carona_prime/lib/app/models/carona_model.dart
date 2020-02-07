@@ -1,3 +1,4 @@
+import 'package:carona_prime/app/models/carona_resposta_model.dart';
 import 'package:carona_prime/app/models/usuario_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -16,11 +17,15 @@ class CaronaModel {
   int grupoId;
   int usuarioId;
 
+  @JsonKey(name: "caronaResposta")
+  List<CaronaRespostaModel> respostas;
+
   @JsonKey(name: "caronaMotorista")
   UsuarioModel motorista;
 
   CaronaModel();
 
-  factory CaronaModel.fromJson(Map<String, dynamic> json) => _$CaronaModelFromJson(json);
+  factory CaronaModel.fromJson(Map<String, dynamic> json) =>
+      _$CaronaModelFromJson(json);
   Map<String, dynamic> toJson() => _$CaronaModelToJson(this);
 }

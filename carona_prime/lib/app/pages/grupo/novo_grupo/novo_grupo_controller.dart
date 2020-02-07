@@ -64,8 +64,9 @@ abstract class NovoGrupoBase with Store {
   List<Contact> get contatosFiltrados {
     if (query != null && query.isNotEmpty)
       return todosContatos
-          .where(
-              (c) => c.displayName.toUpperCase().contains(query.toUpperCase()))
+          .where((c) =>
+              c.displayName != null &&
+              c.displayName.toUpperCase().contains(query.toUpperCase()))
           .toList();
 
     return todosContatos;
@@ -98,10 +99,17 @@ abstract class NovoGrupoBase with Store {
   @action
   Future<bool> salvar() async {
     if (tudoPreenchido()) {
-      var membros = contatosSelecionados
-          .map((c) => MembroGrupoModel(
-              UsuarioModel(c.displayName, c.phones.first.value), false))
-          .toList();
+      List<MembroGrupoModel> membros = contatosSelecionados.map((c) {
+        String numero = "";
+        if (c.phones == null || c.phones.isEmpty)
+          numero = "sem número";
+        else
+          numero = c.phones.first.value;
+
+        return MembroGrupoModel(
+            UsuarioModel(c.displayName ?? "Sem nome", numero), false);
+      }).toList();      
+
       membros.add(MembroGrupoModel(applicationController.usuarioLogado, true));
 
       var latlongs = polyLinePoints

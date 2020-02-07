@@ -15,6 +15,9 @@ abstract class OferecerCaronaBase with Store {
   var applicationController = GetIt.I.get<ApplicationController>();
 
   @observable
+  bool carregou = false;
+
+  @observable
   LocalModel partida;
 
   @observable
@@ -27,7 +30,7 @@ abstract class OferecerCaronaBase with Store {
   bool portaMalasLivre = true;
 
   @observable
-  int vagasDisponiveis = 0;
+  int vagasDisponiveis = 4;
 
   @observable
   TimeOfDay hora;
@@ -93,6 +96,29 @@ abstract class OferecerCaronaBase with Store {
   void setHora(TimeOfDay value) => hora = value;
 
   @action
+  Future<bool> carregarOfertaCarona(int grupoId) async {
+    var retorno = await _repository.carregarOfertaCarona(
+        grupoId, applicationController.usuarioLogado.id);
+    carregou = true;
+    if (retorno != null) {
+      carroAdaptado = retorno.carroAdaptado;
+      portaMalasLivre = retorno.portaMalasLivre;
+      domingo = retorno.domingo;
+      segunda = retorno.segunda;
+      terca = retorno.terca;
+      quarta = retorno.quarta;
+      quinta = retorno.quinta;
+      sexta = retorno.sexta;
+      sabado = retorno.sabado;
+      hora = TimeOfDay(hour: retorno.hora, minute: retorno.minuto);
+      vagasDisponiveis = retorno.totalVagas;
+
+      return true;
+    }
+    return false;
+  }
+
+  @action
   Future<bool> compartilharCarona(int grupoId) async {
     if (tudoPreenchido()) {
       var carona = OfertaCaronaModel()
@@ -109,6 +135,7 @@ abstract class OferecerCaronaBase with Store {
         ..hora = hora.hour
         ..minuto = hora.minute
         ..grupoId = grupoId
+        ..repertirSemanalmente = repetirSemanalmente
         ..usuarioId = applicationController.usuarioLogado.id;
 
       var statusCode = await _repository.compartilharCarona(carona);
