@@ -14,8 +14,7 @@ class LoginRepository {
 
   void enviarCodigo(String number) async {
     try {
-      final phoneNumber = "+55" +
-          number.replaceAll("(", "").replaceAll(")", "").replaceAll("-", "");
+      final phoneNumber = "+55" + applicationController.onlyNumbers(number);
       if (number.length >= 11) {
         await FirebaseAuth.instance.verifyPhoneNumber(
             phoneNumber: phoneNumber,

@@ -30,4 +30,19 @@ abstract class ApplicationBase with Store {
 
     return _formatter.format(data);
   }
+
+
+  bool isNumber(String text) => '0123456789'.split('').contains(text);
+
+  String onlyNumbers(String text) =>
+      text.split('').where((c) => isNumber(c)).join('');
+
+  String phoneNumber(String text) {
+    if (text == null) return null;
+
+    var number = onlyNumbers(text);
+    if (number.length <= 11) return number;
+
+    return number.substring(number.length - 11);
+  }
 }

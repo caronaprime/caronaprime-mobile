@@ -1,9 +1,11 @@
+import 'package:carona_prime/app/application_controller.dart';
 import 'package:carona_prime/app/models/local_model.dart';
 import 'package:carona_prime/app/pages/grupo/novo_grupo/novo_grupo_controller.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 
@@ -18,6 +20,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   final localDestinoTextController = TextEditingController();
   final nomeGrupoTextController = TextEditingController();
   final buscarContatosTextController = TextEditingController();
+  final applicationController = GetIt.I.get<ApplicationController>();
 
   static String kGoogleApiKey = "AIzaSyDny8aAA0AA9LBWNAkNONtTwVLFJz7u6Fo";
   GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
@@ -80,81 +83,92 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
   }
 
   Widget pageSelecionarContatos() {
-    return Observer(
-      builder: (_) {
-        if (!controller.carregouContato)
-          return Center(child: CircularProgressIndicator());
+    return Center(
+      child: Observer(
+        builder: (_) {
+          if (!controller.carregouContato)
+            return Center(child: CircularProgressIndicator());
 
-        return Container(
-          child: controller.todosContatos == null ||
-                  controller.todosContatos.isEmpty
-              ? Center(child: Text("Nenhum contato disponível"))
-              : Container(
-                  child: Column(
+          return Container(
+            child: controller.todosContatos == null ||
+                    controller.todosContatos.isEmpty
+                ? Center(child: Text("Nenhum contato disponível"))
+                : Stack(
                     children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: TextFormField(
-                          validator: controller.textNotEmptyValidator,
-                          controller: buscarContatosTextController,
-                          onChanged: controller.setQuery,
-                          decoration: InputDecoration(
-                              labelText: "Buscar",
-                              hintText: "Buscar",
-                              suffixIcon: Icon(Icons.search)),
-                        ),
+                      Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8),
+                            child: TextFormField(
+                              validator: controller.textNotEmptyValidator,
+                              controller: buscarContatosTextController,
+                              onChanged: controller.setQuery,
+                              decoration: InputDecoration(
+                                  labelText: "Buscar",
+                                  hintText: "Buscar",
+                                  suffixIcon: Icon(Icons.search)),
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView(
+                              children:
+                                  controller.contatosFiltrados.map((contact) {
+                                var avatar = CircleAvatar(
+                                  child: conteudoAvatar(contact),
+                                );
+                                String numero = "";
+                                if (contact.phones == null ||
+                                    contact.phones.isEmpty)
+                                  numero = "sem número";
+                                else
+                                  numero = contact.phones.first.value;
+                                return ListTile(
+                                    title: Text(contact.displayName ?? "Sem nome"),
+                                    subtitle: Text(numero),
+                                    trailing: Checkbox(
+                                      value: controller.contatosSelecionados !=
+                                              null &&
+                                          controller.contatosSelecionados
+                                                  .indexOf(contact) >=
+                                              0,
+                                      onChanged: (value) {
+                                        if (value) {
+                                          controller
+                                              .adicionarContatoSelecionado(
+                                                  contact);
+                                        } else {
+                                          controller.removerContatoSelecionado(
+                                              contact);
+                                        }
+                                      },
+                                    ),
+                                    leading: avatar);
+                              }).toList(),
+                            ),
+                          ),
+                        ],
                       ),
-                      Expanded(
-                          child: controller?.contatosFiltrados == null ||
-                                  controller.contatosFiltrados.isEmpty
-                              ? Container()
-                              : ListView.builder(
-                                  itemCount:
-                                      controller.contatosFiltrados.length,
-                                  itemBuilder: (_, index) {
-                                    var contact =
-                                        controller.contatosFiltrados[index];
-                                    var avatar = CircleAvatar(
-                                        child: conteudoAvatar(contact));
-
-                                    String numero = "";
-                                    if (contact.phones == null ||
-                                        contact.phones.isEmpty)
-                                      numero = "sem número";
-                                    else
-                                      numero = contact.phones.first.value;
-
-                                    return ListTile(
-                                        title: Text(
-                                            contact.displayName ?? "Sem nome"),
-                                        subtitle: Text(numero),
-                                        trailing: Checkbox(
-                                          value: controller
-                                                      .contatosSelecionados !=
-                                                  null &&
-                                              controller.contatosSelecionados
-                                                      .indexOf(contact) >=
-                                                  0,
-                                          onChanged: (value) {
-                                            if (value) {
-                                              controller
-                                                  .adicionarContatoSelecionado(
-                                                      contact);
-                                            } else {
-                                              controller
-                                                  .removerContatoSelecionado(
-                                                      contact);
-                                            }
-                                          },
-                                        ),
-                                        leading: avatar);
-                                  }))
                     ],
                   ),
-                ),
-        );
-      },
+          );
+        },
+      ),
     );
+  }
+
+  bool contatoEstaNaLista(Contact contato, List<Contact> contatos) {
+    if (contato.phones?.length > 0) {
+      var numeroFormatado =
+          applicationController.phoneNumber(contato.phones.first.value);
+      var numeros = contatos.map((c) {
+        if (c.phones?.length > 0) {
+          return applicationController.phoneNumber(c.phones.first.value);
+        }
+        return "";
+      });
+      return numeros.contains(numeroFormatado);
+    }
+    return false;
   }
 
   conteudoAvatar(Contact contact) {
