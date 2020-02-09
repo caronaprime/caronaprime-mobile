@@ -4,6 +4,7 @@ import 'package:carona_prime/app/models/local_model.dart';
 import 'package:carona_prime/app/models/usuario_model.dart';
 import 'package:carona_prime/app/shared/repositories/grupo_repository.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobx/mobx.dart';
 
 part 'detalhes_grupo_controller.g.dart';
@@ -14,6 +15,13 @@ class DetalhesGrupoController = DetalhesGrupoBase
 abstract class DetalhesGrupoBase with Store {
   var _repository = GrupoRepository();
   var applicationController = GetIt.I.get<ApplicationController>();
+
+  @observable
+  ObservableList<LatLng> polyLinePoints = ObservableList<LatLng>();
+
+  @observable
+  ObservableList<Marker> markers = ObservableList<Marker>();
+
 
   @observable
   String nomeDoGrupo = "";
@@ -77,6 +85,13 @@ abstract class DetalhesGrupoBase with Store {
       usuarioEhAdministrador = grupo.membros.any((m) =>
           m.administrador &&
           m.usuario.id == applicationController.usuarioLogado.id);
+
+      var polys = grupo.latLongs.map((l) => LatLng(l.latitude, l.longitude)).toList();
+      polyLinePoints.clear();
+      polyLinePoints.addAll(polys);     
+
+      markers.add(Marker(markerId: MarkerId(grupo.partida.placeId), position: LatLng(grupo.partida.latitude, grupo.partida.longitude)));
+      markers.add(Marker(markerId: MarkerId(grupo.destino.placeId), position: LatLng(grupo.destino.latitude, grupo.destino.longitude)));
 
       await _carregarProximasViagens(grupoId);
     }

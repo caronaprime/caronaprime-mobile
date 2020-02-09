@@ -7,6 +7,7 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobx/mobx.dart';
 
 class DetalhesGrupoPage extends StatelessWidget {
@@ -35,22 +36,33 @@ class DetalhesGrupoPage extends StatelessWidget {
                     onDesistirDaCarona: (caronaId) => print(caronaId),
                     //TODO: implementar desistencia
                   ),
-                  pageMembros(context, _controller.membros)
+                  pageMembros(context, _controller.membros),
+                  pageRota(context)
                 ].elementAt(_controller.pageIndex))),
         bottomNavigationBar: Observer(
           builder: (_) => BottomNavigationBar(
             items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
-                icon: Icon(Icons.departure_board),
-                title: Text('Caronas Disponíveis'),
+                icon: Icon(Icons.departure_board,
+                    color: Theme.of(context).accentColor),
+                title: Text('Disponíveis',
+                    style: TextStyle(color: Theme.of(context).accentColor)),
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.directions_car),
-                title: Text('Próximas Viagens'),
+                icon: Icon(Icons.directions_car,
+                    color: Theme.of(context).accentColor),
+                title: Text('Próximas',
+                    style: TextStyle(color: Theme.of(context).accentColor)),
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.group),
-                title: Text('Membros'),
+                icon: Icon(Icons.group, color: Theme.of(context).accentColor),
+                title: Text('Membros',
+                    style: TextStyle(color: Theme.of(context).accentColor)),
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.map, color: Theme.of(context).accentColor),
+                title: Text('Rota',
+                    style: TextStyle(color: Theme.of(context).accentColor)),
               ),
             ],
             onTap: _controller.setPageIndex,
@@ -200,6 +212,37 @@ class DetalhesGrupoPage extends StatelessWidget {
                 ),
         ),
       ],
+    );
+  }
+
+  pageRota(BuildContext context) {
+    return Observer(
+      builder: (_) {
+        if (_controller.markers == null || _controller.markers.length == 0)
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+
+        return Container(
+            child: GoogleMap(
+          mapToolbarEnabled: true,
+          myLocationEnabled: true,
+          myLocationButtonEnabled: true,
+          polylines: [
+            Polyline(
+                width: 5,
+                color: Theme.of(context).primaryColor,
+                polylineId:
+                    PolylineId(_controller.markers.first.markerId.value),
+                points: _controller.polyLinePoints.toList())
+          ].toSet(),
+          initialCameraPosition: CameraPosition(
+              target: LatLng(_controller.polyLinePoints.first.latitude,
+                  _controller.polyLinePoints.first.longitude),
+              zoom: 14),
+          markers: _controller.markers.toSet(),
+        ));
+      },
     );
   }
 

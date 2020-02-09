@@ -48,14 +48,9 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
           child: PageView(
               physics: NeverScrollableScrollPhysics(),
               controller: pageController,
-              // pageSnapping: true,
+              pageSnapping: true,
               children: <Widget>[
                 pageSelecionarContatos(),
-                // SelecionarContatoPage(
-                //   mostrarBotaoConcluir: false,
-                //   membros: contatosSelecionados,
-                //   paginaCompleta: false,
-                // ),
                 pageSelecionarRota(),
                 pageDados(),
               ]),
@@ -119,9 +114,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                               children:
                                   controller.contatosFiltrados.map((contact) {
                                 var avatar = CircleAvatar(
-                                  child: contact.avatar.isEmpty
-                                      ? Text(contact.displayName[0])
-                                      : Image.memory(contact.avatar),
+                                  child: conteudoAvatar(contact),
                                 );
                                 String numero = "";
                                 if (contact.phones == null ||
@@ -130,7 +123,7 @@ class _NovoGrupoPageState extends State<NovoGrupoPage> {
                                 else
                                   numero = contact.phones.first.value;
                                 return ListTile(
-                                    title: Text(contact.displayName),
+                                    title: Text(contact.displayName ?? "Sem nome"),
                                     subtitle: Text(numero),
                                     trailing: Checkbox(
                                       value: controller.contatosSelecionados !=

@@ -99,10 +99,11 @@ abstract class NovoGrupoBase with Store {
   @action
   Future<bool> salvar() async {
     if (tudoPreenchido()) {
-      List<MembroGrupoModel> membros = contatosSelecionados.map((c) {
+      List<MembroGrupoModel> membrosSelecionados =
+          contatosSelecionados.map((c) {
         String numero = "";
         if (c.phones == null || c.phones.isEmpty)
-          numero = "sem número";
+          numero = "";
         else
           numero = c.phones.first.value;
 
@@ -110,7 +111,12 @@ abstract class NovoGrupoBase with Store {
             UsuarioModel(c.displayName ?? "Sem nome", numero), false);
       }).toList();
 
-      membros.add(MembroGrupoModel(applicationController.usuarioLogado, true));
+      membrosSelecionados
+          .add(MembroGrupoModel(applicationController.usuarioLogado, true));
+      var membrosValidos = membrosSelecionados
+          .where(
+              (c) => c.usuario.celular != null && c.usuario.celular.isNotEmpty)
+          .toList();
 
       var latlongs = polyLinePoints
           .map((p) => LatLngModel(p.latitude, p.longitude))
@@ -120,7 +126,7 @@ abstract class NovoGrupoBase with Store {
         ..nome = nomeGrupo
         ..partida = localDePartida
         ..destino = localDeDestino
-        ..membros = membros
+        ..membros = membrosValidos
         ..partida = localDePartida
         ..destino = localDeDestino
         ..latLongs = latlongs;
@@ -186,6 +192,7 @@ abstract class NovoGrupoBase with Store {
         localDeDestino.latitude,
         localDeDestino.longitude);
 
+    polyLinePoints.clear();
     for (var point in points) {
       polyLinePoints.add(LatLng(point.latitude, point.longitude));
     }
