@@ -2,6 +2,7 @@ import 'package:carona_prime/app/pages/inicio/inicio_controller.dart';
 import 'package:carona_prime/app/pages/politica_privacidade/politica_privacidade_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:video_player/video_player.dart';
 
 class PoliticaPrivacidadePage extends StatelessWidget {
   final controller = PoliticaPrivacidadeController();
@@ -12,6 +13,15 @@ class PoliticaPrivacidadePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    VideoPlayerController _videoPlayerController;
+    Future<void> _initializeVideoPlayerFuture;
+
+    _videoPlayerController = VideoPlayerController.network(
+      'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+    );
+    _initializeVideoPlayerFuture = _videoPlayerController.initialize();
+    _videoPlayerController.setLooping(true);
+
     var esconder = pageController == null || inicioController == null;
     return Scaffold(
       appBar: AppBar(
@@ -69,8 +79,10 @@ class PoliticaPrivacidadePage extends StatelessWidget {
               Observer(
                   builder: (_) => termos(
                       context,
-                      "Nenhuma informação pessoal fornecida ao aplicativo" +
-                          "será divulgada publicamente (númer de telefone, agenda de contatos, ect).",
+                      " - Nenhuma informação pessoal fornecida ao aplicativo será divulgada publicamente (número de telefone, agenda de contatos, ect). \n" +
+                          " - O Carona Prime se compromete a não vender, alugar ou repassar suas informações para terceiros. \n" +
+                          " - Se solicitadas, suas informações retidas serão fornecidas à justiça, sob condição de apresentação de uma ordem judicial \n" +
+                          " - O aplicativo emitirá aviso quando precisar acessar a lista de contatos ou GPS \n",
                       controller?.aceitoUsoDeInformacoes ?? true,
                       controller?.setAceitoUsoDeInformacoes)),
               Padding(
@@ -83,10 +95,36 @@ class PoliticaPrivacidadePage extends StatelessWidget {
               Observer(
                   builder: (_) => termos(
                       context,
-                      "Seus dados ficarão armazenados no Servidor da Google," +
-                          "Eles ficarão armazenados pelo período de 6 meses",
+                      " - A aplicação armazenará informações do usuário somente no dispositivo, tornando assim não efetivo ou necessário o uso de criptografia, exceto em versão posterior que faça uso de senhas e dados pessoais \n" +
+                          " - Se for solicitada a exclusão dos dados por meio do usuário, eles ainda permanecerão armazenados pelo período de 6 meses. \n" +
+                          " - Em caso de dúvida, solicitamos que nos contate através do seguinte e-mail: lavi.ic.ufmt@gmail.com \n",
                       controller?.aceitoArmazenamento ?? true,
                       controller?.setAceitoArmazenamento)),
+              Observer(
+                builder: (_) => GestureDetector(
+                  onTap: () {
+                    if (_videoPlayerController.value.isPlaying) {
+                      _videoPlayerController.pause();
+                    } else {
+                      _videoPlayerController.play();
+                    }
+                    controller.setVideoExecutando(!controller.videoExecutando);
+                  },
+                  child: FutureBuilder(
+                    future: _initializeVideoPlayerFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return AspectRatio(
+                          aspectRatio: _videoPlayerController.value.aspectRatio,
+                          child: VideoPlayer(_videoPlayerController),
+                        );
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  ),
+                ),
+              )
             ],
           ),
         ),

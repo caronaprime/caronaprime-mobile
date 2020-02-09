@@ -11,6 +11,12 @@ abstract class PoliticaPrivacidadeBase with Store {
   @observable
   bool aceitoArmazenamento = false;
 
+  @observable
+  bool videoExecutando = false;
+
+  @action
+  void setVideoExecutando(bool value) => videoExecutando = value;
+
   @action
   void setAceitoUsoDeInformacoes(bool value) => aceitoUsoDeInformacoes = value;
 
