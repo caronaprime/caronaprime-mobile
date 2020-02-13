@@ -22,8 +22,7 @@ dependencies:
   firebase_auth: ^0.14.0+5     
   google_maps_flutter: ^0.5.21+8
   geolocator: ^5.1.5
-  flutter_google_places: ^0.2.3
-  cloud_firestore: ^0.12.10+2
+  flutter_google_places: ^0.2.3  
   geocoder: ^0.2.1
   flutter_polyline_points: ^0.1.0
   contacts_service: ^0.3.9

@@ -23,8 +23,8 @@ class PerguntasFrequentesPage extends StatelessWidget {
             perguntaFrequente(context, "Como posso escolher quem levar?",
                 "Quisque dapibus ultrices nulla nec pharetra. Quisque pharetra sapien at tincidunt pretium. In ultricies blandit odio."),
             perguntaFrequente(context, "Como entro em um grupo?",
-                "Nunc a dignissim tellus. Interdum et malesuada fames ac ante ipsum primis in faucibus"),
-            Text("Veja o mini tutorial:"),            
+                "Para participar de um grupo é necessário que um administrador lhe adicione, caso você opte, pode sair do grupo a qualquer momento."),
+            // Text("Veja o mini tutorial:"),            
             
           ],
         ),

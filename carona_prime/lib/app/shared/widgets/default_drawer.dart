@@ -12,11 +12,12 @@ class DefaultDrawer extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: <Widget>[
-          UserAccountsDrawerHeader(
-            accountEmail: Text("teste@teste.com"),
-            accountName: Text("Nome Sobrenome"),
+          UserAccountsDrawerHeader(             
+            accountEmail: Text(applicationController.usuarioLogado.celular),
+            accountName: Text(applicationController.usuarioLogado.nome),            
             currentAccountPicture: CircleAvatar(
-              child: Text("CP"),
+              child: Text(
+                  applicationController.usuarioLogado.nome.substring(0, 1)),
             ),
           ),
           ListTile(leading: Icon(Icons.settings), title: Text("Configurações")),
@@ -57,7 +58,7 @@ class DefaultDrawer extends StatelessWidget {
                             applicationController.deslogar();
                             while (Navigator.canPop(context)) {
                               Navigator.pop(context);
-                            }                            
+                            }
                           },
                         )
                       ],
