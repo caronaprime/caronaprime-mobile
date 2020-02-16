@@ -3,14 +3,29 @@ import 'package:carona_prime/app/pages/inicio/inicio_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'application_controller.dart';
+import 'models/usuario_model.dart';
 
 class AppWidget extends StatelessWidget {
+  final applicationController = GetIt.I.get<ApplicationController>();
+
+  Future tentarLogarUsuario() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int usuarioId = (prefs.getInt('usuarioId') ?? 0);
+    String usuarioNome = prefs.getString('usuarioNome');
+    String usuarioCelular = prefs.getString('usuarioCelular');
+
+    if (usuarioId > 0 && usuarioNome != null && usuarioCelular != null) {
+      var usuario = UsuarioModel(usuarioNome, usuarioCelular, id: usuarioId);
+      await applicationController.logar(usuario);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    var applicationController = GetIt.I.get<ApplicationController>();
-
+    tentarLogarUsuario();
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Carona Prime',

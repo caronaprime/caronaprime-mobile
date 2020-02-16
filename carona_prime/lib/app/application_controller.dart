@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:mobx/mobx.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/usuario_model.dart';
 part 'application_controller.g.dart';
@@ -14,10 +15,22 @@ abstract class ApplicationBase with Store {
   bool get logado => usuarioLogado != null;
 
   @action
-  void logar(UsuarioModel usuario) => usuarioLogado = usuario;
+  Future logar(UsuarioModel usuario) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('usuarioId', usuario.id);
+    prefs.setString('usuarioNome', usuario.nome);
+    prefs.setString('usuarioCelular', usuario.celular);
+    usuarioLogado = usuario;
+  }
 
   @action
-  void deslogar() => usuarioLogado = null;
+  Future deslogar() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('usuarioId', 0);
+    prefs.setString('usuarioNome', null);
+    prefs.setString('usuarioCelular', null);
+    usuarioLogado = null;
+  }
 
   String descricaoData(DateTime data) {
     final _formatter = DateFormat('dd/MM/yyyy');
@@ -30,7 +43,6 @@ abstract class ApplicationBase with Store {
 
     return _formatter.format(data);
   }
-
 
   bool isNumber(String text) => '0123456789'.split('').contains(text);
 
