@@ -131,7 +131,7 @@ class LoginPage extends StatelessWidget {
     var entrou = await controller.entrar(codeTextController.text);
 
     if (entrou) {
-      while (Navigator.canPop(context)) {
+      while (Navigator.of(context).canPop()) {
         Navigator.pop(context);
       }
     }

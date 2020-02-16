@@ -39,7 +39,7 @@ class LoginRepository {
       var usuarioModel =
           await buscarOuCriarUsuario(nome, phoneNumber, user.uid);
       print('Usuário logado com sucesso $user');
-      applicationController.logar(usuarioModel);
+      await applicationController.logar(usuarioModel);
       return true;
     } catch (e) {
       return false;

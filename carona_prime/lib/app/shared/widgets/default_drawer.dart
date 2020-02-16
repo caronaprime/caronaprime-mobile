@@ -12,9 +12,9 @@ class DefaultDrawer extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: <Widget>[
-          UserAccountsDrawerHeader(             
+          UserAccountsDrawerHeader(
             accountEmail: Text(applicationController.usuarioLogado.celular),
-            accountName: Text(applicationController.usuarioLogado.nome),            
+            accountName: Text(applicationController.usuarioLogado.nome),
             currentAccountPicture: CircleAvatar(
               child: Text(
                   applicationController.usuarioLogado.nome.substring(0, 1)),
@@ -54,8 +54,8 @@ class DefaultDrawer extends StatelessWidget {
                             onPressed: () => Navigator.of(context).pop()),
                         FlatButton(
                           child: Text("Sair"),
-                          onPressed: () {
-                            applicationController.deslogar();
+                          onPressed: () async {
+                            await applicationController.deslogar();
                             while (Navigator.canPop(context)) {
                               Navigator.pop(context);
                             }
