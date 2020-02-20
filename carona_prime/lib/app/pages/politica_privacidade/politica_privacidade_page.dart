@@ -13,14 +13,21 @@ class PoliticaPrivacidadePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    VideoPlayerController _videoPlayerController;
+    VideoPlayerController _videoPlayerArmazenamentoController;
     Future<void> _initializeVideoPlayerFuture;
 
-    _videoPlayerController = VideoPlayerController.network(
-      'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+    _videoPlayerArmazenamentoController = VideoPlayerController.asset(
+      'assets/armazenamento.mp4',
     );
-    _initializeVideoPlayerFuture = _videoPlayerController.initialize();
-    _videoPlayerController.setLooping(true);
+    _initializeVideoPlayerFuture = _videoPlayerArmazenamentoController.initialize();
+    _videoPlayerArmazenamentoController.setLooping(true);
+
+
+    var _videoPlayerInformacoesController = VideoPlayerController.asset(
+      'assets/informacoes.mp4',
+    );
+    _initializeVideoPlayerFuture = _videoPlayerInformacoesController.initialize();
+    _videoPlayerInformacoesController.setLooping(true);
 
     var esconder = pageController == null || inicioController == null;
     return Scaffold(
@@ -85,6 +92,31 @@ class PoliticaPrivacidadePage extends StatelessWidget {
                           " - O aplicativo emitirá aviso quando precisar acessar a lista de contatos ou GPS \n",
                       controller?.aceitoUsoDeInformacoes ?? true,
                       controller?.setAceitoUsoDeInformacoes)),
+                      Observer(
+                builder: (_) => GestureDetector(
+                  onTap: () {
+                    if (_videoPlayerInformacoesController.value.isPlaying) {
+                      _videoPlayerInformacoesController.pause();
+                    } else {
+                      _videoPlayerInformacoesController.play();
+                    }
+                    controller.setVideoExecutando(!controller.videoExecutando);
+                  },
+                  child: FutureBuilder(
+                    future: _initializeVideoPlayerFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return AspectRatio(
+                          aspectRatio: _videoPlayerInformacoesController.value.aspectRatio,
+                          child: VideoPlayer(_videoPlayerInformacoesController),
+                        );
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  ),
+                ),
+              ),
               Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Center(
@@ -103,10 +135,10 @@ class PoliticaPrivacidadePage extends StatelessWidget {
               Observer(
                 builder: (_) => GestureDetector(
                   onTap: () {
-                    if (_videoPlayerController.value.isPlaying) {
-                      _videoPlayerController.pause();
+                    if (_videoPlayerArmazenamentoController.value.isPlaying) {
+                      _videoPlayerArmazenamentoController.pause();
                     } else {
-                      _videoPlayerController.play();
+                      _videoPlayerArmazenamentoController.play();
                     }
                     controller.setVideoExecutando(!controller.videoExecutando);
                   },
@@ -115,8 +147,8 @@ class PoliticaPrivacidadePage extends StatelessWidget {
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         return AspectRatio(
-                          aspectRatio: _videoPlayerController.value.aspectRatio,
-                          child: VideoPlayer(_videoPlayerController),
+                          aspectRatio: _videoPlayerArmazenamentoController.value.aspectRatio,
+                          child: VideoPlayer(_videoPlayerArmazenamentoController),
                         );
                       } else {
                         return Center(child: CircularProgressIndicator());
