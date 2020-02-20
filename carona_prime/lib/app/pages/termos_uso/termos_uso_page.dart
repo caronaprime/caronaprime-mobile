@@ -20,10 +20,9 @@ class _TermosUsoPageState extends State<TermosUsoPage> {
   Future<void> _initializeVideoPlayerFuture;
 
   @override
-  void initState() {
-    _videoPlayerController = VideoPlayerController.network(
-      'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
-    );
+  void initState() {    
+    _videoPlayerController =
+        VideoPlayerController.asset('assets/pontosimportantes.mp4');
     _initializeVideoPlayerFuture = _videoPlayerController.initialize();
     _videoPlayerController.setLooping(true);
     super.initState();
@@ -117,7 +116,7 @@ class _TermosUsoPageState extends State<TermosUsoPage> {
                       " - Para que o aplicativo funcione corretamente, é importante que haja conexão com internet. \n",
                   style: Theme.of(context).textTheme.body2),
               GestureDetector(
-                onTap: () => setState(() {                  
+                onTap: () => setState(() {
                   if (_videoPlayerController.value.isPlaying) {
                     _videoPlayerController.pause();
                   } else {
